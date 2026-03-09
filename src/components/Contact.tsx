@@ -1,6 +1,10 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Instagram, Youtube, ArrowUpRight, Send, CheckCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MapPin, Instagram, Youtube, ArrowUpRight, Send, CheckCircle, Mail, MessageSquare, User } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const socialLinks = [
   {
@@ -8,257 +12,379 @@ const socialLinks = [
     handle: '@Buckley.lens',
     url: 'https://instagram.com/Buckley.lens',
     icon: Instagram,
-    color: 'hover:text-pink-500',
+    color: '#E4405F',
+    followers: 'Portfolio',
   },
   {
     name: 'YouTube',
     handle: '@Volraiden',
     url: 'https://youtube.com/@Volraiden',
     icon: Youtube,
-    color: 'hover:text-red-500',
+    color: '#FF0000',
+    followers: 'Videos',
   },
 ];
 
 export default function Contact() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.fromTo(
+        '.contact-header',
+        { y: 60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.contact-header',
+            start: 'top 85%',
+          },
+        }
+      );
+
+      // Left column reveal
+      gsap.fromTo(
+        '.contact-info',
+        { x: -50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.contact-info',
+            start: 'top 85%',
+          },
+        }
+      );
+
+      // Form reveal
+      gsap.fromTo(
+        '.contact-form',
+        { x: 50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.contact-form',
+            start: 'top 85%',
+          },
+        }
+      );
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
+    setIsSubmitting(true);
+
+    // Simulate submission
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsSubmitting(false);
     setIsSubmitted(true);
+
+    // Reset after showing success
     setTimeout(() => {
       setIsSubmitted(false);
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ name: '', email: '', subject: '', message: '' });
     }, 3000);
   };
 
+  const inputClasses = (field: string) =>
+    `w-full rounded-xl border bg-transparent px-4 py-4 text-white placeholder-white/30 transition-all duration-300 focus:outline-none ${
+      focusedField === field
+        ? 'border-accent shadow-lg shadow-accent/10'
+        : 'border-white/10 hover:border-white/20'
+    }`;
+
   return (
-    <section id="contact" className="relative bg-background py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section
+      ref={sectionRef}
+      id="contact"
+      className="relative overflow-hidden bg-background py-24 sm:py-32"
+    >
+      {/* Background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full bg-accent/5 blur-[200px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="mb-16 text-center"
-        >
-          <span className="font-display text-sm font-medium uppercase tracking-widest text-accent">
+        <div className="contact-header mb-16 text-center">
+          <span className="inline-block text-xs uppercase tracking-[0.3em] text-accent">
             Get in Touch
           </span>
-          <h2 className="mt-4 font-display text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl">
+          <h2 className="mt-4 font-display text-4xl font-bold text-white text-3d sm:text-5xl lg:text-6xl">
             Let's Create Something
-            <span className="text-accent"> Amazing</span>
+            <span className="text-accent text-3d-accent"> Amazing</span>
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-muted">
-            Available for motorsport events, commercial projects, and creative collaborations. 
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-white/50">
+            Available for motorsport events, commercial projects, and creative collaborations.
             Based in Uzbekistan, working worldwide.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            {/* Location */}
-            <div className="glass rounded-2xl p-6">
+          <div className="contact-info space-y-8">
+            {/* Location Card */}
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="glass rounded-3xl p-6"
+              data-cursor="hover"
+            >
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10">
-                  <MapPin className="h-6 w-6 text-accent" />
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-accent/10">
+                  <MapPin className="h-7 w-7 text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-semibold text-foreground">
+                  <h3 className="font-display text-lg font-semibold text-white">
                     Based in Uzbekistan
                   </h3>
-                  <p className="mt-2 text-muted">
-                    Available for projects across Central Asia, Middle East, and worldwide. 
+                  <p className="mt-2 text-sm leading-relaxed text-white/50">
+                    Available for projects across Central Asia, Middle East, and worldwide.
                     Previous work locations include Dubai, Australia, and various Asian circuits.
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Social Links */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4">
               {socialLinks.map((social, index) => (
                 <motion.a
-                  key={index}
+                  key={social.name}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ x: 5, scale: 1.02 }}
                   className="group flex items-center gap-4 rounded-2xl bg-card p-5 transition-all duration-300 hover:bg-card/80"
+                  data-cursor="hover"
                 >
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 transition-colors duration-300 ${social.color}`}>
-                    <social.icon className="h-6 w-6 text-accent" />
+                  <div
+                    className="flex h-14 w-14 items-center justify-center rounded-xl transition-colors duration-300"
+                    style={{ backgroundColor: `${social.color}15` }}
+                  >
+                    <social.icon className="h-7 w-7" style={{ color: social.color }} />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-foreground">{social.name}</h4>
-                    <p className="text-sm text-muted">{social.handle}</p>
+                    <h4 className="font-semibold text-white">{social.name}</h4>
+                    <p className="text-sm text-white/50">{social.handle}</p>
                   </div>
-                  <ArrowUpRight className="h-5 w-5 text-muted opacity-0 transition-all duration-300 group-hover:opacity-100" />
+                  <div className="text-right">
+                    <ArrowUpRight className="h-5 w-5 text-white/20 transition-all duration-300 group-hover:text-white/60" />
+                  </div>
                 </motion.a>
               ))}
             </div>
 
-            {/* Quick Info */}
+            {/* Quick Facts */}
             <div className="rounded-2xl bg-card p-6">
-              <h4 className="mb-4 font-display font-semibold text-foreground">
+              <h4 className="mb-4 font-display font-semibold text-white">
                 Quick Facts
               </h4>
-              <ul className="space-y-3 text-sm text-muted">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-4 w-4 text-accent" />
-                  <span>Available for international travel</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-4 w-4 text-accent" />
-                  <span>Motorsport event coverage specialist</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-4 w-4 text-accent" />
-                  <span>Same-day editing available</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-4 w-4 text-accent" />
-                  <span>Multi-camera setup available</span>
-                </li>
+              <ul className="space-y-3">
+                {[
+                  'Available for international travel',
+                  'Motorsport event coverage specialist',
+                  'Same-day editing available',
+                  'Multi-camera setup available',
+                ].map((fact) => (
+                  <li key={fact} className="flex items-center gap-3 text-sm text-white/50">
+                    <CheckCircle className="h-4 w-4 flex-shrink-0 text-accent" />
+                    {fact}
+                  </li>
+                ))}
               </ul>
             </div>
-          </motion.div>
+          </div>
 
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <form onSubmit={handleSubmit} className="rounded-3xl bg-card p-8">
-              <h3 className="mb-6 font-display text-xl font-semibold text-foreground">
+          <div className="contact-form">
+            <form
+              ref={formRef}
+              onSubmit={handleSubmit}
+              className="relative rounded-3xl bg-card p-8"
+            >
+              {/* Success Overlay */}
+              <AnimatePresence>
+                {isSubmitted && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-card"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-center"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: 'spring' }}
+                        className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/20"
+                      >
+                        <CheckCircle className="h-10 w-10 text-green-500" />
+                      </motion.div>
+                      <h3 className="font-display text-2xl font-semibold text-white">
+                        Message Sent!
+                      </h3>
+                      <p className="mt-2 text-white/50">I'll get back to you soon.</p>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <h3 className="mb-6 font-display text-xl font-semibold text-white">
                 Send a Message
               </h3>
 
               <div className="space-y-5">
                 {/* Name */}
-                <div>
-                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
-                    Name
-                  </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/30" />
                   <input
                     type="text"
-                    id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder-muted transition-all duration-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    onFocus={() => setFocusedField('name')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('name') + ' pl-12'}
                     placeholder="Your name"
                     required
                   />
                 </div>
 
                 {/* Email */}
-                <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
-                    Email
-                  </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/30" />
                   <input
                     type="email"
-                    id="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder-muted transition-all duration-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('email') + ' pl-12'}
                     placeholder="your@email.com"
                     required
                   />
                 </div>
 
+                {/* Subject */}
+                <div className="relative">
+                  <MessageSquare className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/30" />
+                  <input
+                    type="text"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    onFocus={() => setFocusedField('subject')}
+                    onBlur={() => setFocusedField(null)}
+                    className={inputClasses('subject') + ' pl-12'}
+                    placeholder="Subject"
+                    required
+                  />
+                </div>
+
                 {/* Message */}
-                <div>
-                  <label htmlFor="message" className="mb-2 block text-sm font-medium text-foreground">
-                    Message
-                  </label>
+                <div className="relative">
+                  <MessageSquare className="absolute left-4 top-4 h-5 w-5 text-white/30" />
                   <textarea
-                    id="message"
-                    rows={5}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder-muted transition-all duration-300 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    onFocus={() => setFocusedField('message')}
+                    onBlur={() => setFocusedField(null)}
+                    rows={5}
+                    className={inputClasses('message') + ' resize-none pl-12 pt-4'}
                     placeholder="Tell me about your project..."
                     required
                   />
                 </div>
 
                 {/* Submit Button */}
-                <button
+                <motion.button
                   type="submit"
-                  disabled={isSubmitted}
-                  className={`group flex w-full items-center justify-center gap-2 rounded-xl py-4 font-medium text-white transition-all duration-300 ${
-                    isSubmitted
-                      ? 'bg-green-500'
-                      : 'bg-accent hover:bg-accent/90 hover:shadow-lg hover:shadow-accent/25'
-                  }`}
+                  disabled={isSubmitting}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="glow-btn group flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-4 font-semibold text-white transition-all disabled:opacity-50"
+                  data-cursor="hover"
                 >
-                  {isSubmitted ? (
-                    <>
-                      <CheckCircle className="h-5 w-5" />
-                      Message Sent!
-                    </>
+                  {isSubmitting ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white"
+                    />
                   ) : (
                     <>
                       <Send className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                      Send Message
+                      <span>Send Message</span>
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
             </form>
-          </motion.div>
+          </div>
         </div>
-      </div>
 
-      {/* Footer */}
-      <footer className="mx-auto mt-24 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-border py-8 sm:flex-row">
-          <div className="flex items-center gap-3">
-            <img
-              src="/images/logos/duneworks.png"
-              alt="Duneworks"
-              className="h-8 w-auto opacity-50"
-            />
-            <span className="text-sm text-muted">
-              © {new Date().getFullYear()} Daniel Lee Buckley. All rights reserved.
-            </span>
+        {/* Footer */}
+        <footer className="mt-24 border-t border-white/10 pt-8">
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <div className="flex items-center gap-3">
+              <img
+                src="/images/logos/duneworks.png"
+                alt="Duneworks"
+                className="h-8 w-auto opacity-40"
+              />
+              <span className="text-sm text-white/40">
+                © {new Date().getFullYear()} Daniel Lee Buckley
+              </span>
+            </div>
+            <div className="flex items-center gap-6">
+              {['Instagram', 'YouTube'].map((link) => (
+                <a
+                  key={link}
+                  href={link === 'Instagram' ? 'https://instagram.com/Buckley.lens' : 'https://youtube.com/@Volraiden'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-white/40 transition-colors hover:text-white"
+                  data-cursor="hover"
+                >
+                  {link}
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <a
-              href="https://instagram.com/Buckley.lens"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted transition-colors hover:text-foreground"
-            >
-              Instagram
-            </a>
-            <a
-              href="https://youtube.com/@Volraiden"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted transition-colors hover:text-foreground"
-            >
-              YouTube
-            </a>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </section>
   );
 }
