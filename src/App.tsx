@@ -13,6 +13,7 @@ import {
   Send,
   Globe,
 } from 'lucide-react';
+import LogoMarquee from './components/LogoMarquee';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -170,7 +171,6 @@ function App() {
               loop
               playsInline
               className="hero-video"
-              poster="/images/logos/duneworks.png"
             >
               <source src="/videos/hero.mp4" type="video/mp4" />
             </video>
@@ -215,6 +215,9 @@ function App() {
 
           <div className="hero-scroll">Scroll to explore</div>
         </section>
+
+        {/* Trusted Partners */}
+        <LogoMarquee />
 
         {/* About Section */}
         <section id="about" className="content-section">

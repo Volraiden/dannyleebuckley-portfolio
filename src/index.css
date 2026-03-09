@@ -197,6 +197,7 @@ textarea {
   position: absolute;
   inset: 0;
   z-index: 0;
+  background: #0a0a0b;
 }
 
 .hero-video {

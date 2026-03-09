@@ -120,7 +120,7 @@ export default function Hero() {
       id="hero"
     >
       {/* Video Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 bg-[#0a0a0b]">
         <video
           ref={videoRef}
           autoPlay
@@ -128,7 +128,6 @@ export default function Hero() {
           loop
           playsInline
           className="h-full w-full object-cover scale-110"
-          poster="/images/logos/duneworks.png"
         >
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
