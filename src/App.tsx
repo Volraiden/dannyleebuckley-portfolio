@@ -13,7 +13,6 @@ import {
   Send,
   Globe,
 } from 'lucide-react';
-import LogoMarquee from './components/LogoMarquee';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -65,7 +64,7 @@ const featuredWork = [
   },
 ];
 
-// Client logos - all companies I've worked with
+// Client logos - all companies I've worked with (Trusted By grid)
 const clientLogos = [
   { name: 'Client 2', logo: '/images/logos/client2.png?v=6' },
   { name: 'Client 3', logo: '/images/logos/client3.png?v=6' },
@@ -76,6 +75,9 @@ const clientLogos = [
   { name: '24H Series', logo: '/images/logos/24h-series.png?v=6' },
   { name: 'ZBS', logo: '/images/logos/zbs.png?v=6' },
   { name: 'Iguana Studios', logo: '/images/logos/iguana-studios.png?v=6' },
+  { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
+  { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
+  { name: 'LS', logo: '/images/logos/ls.png' },
 ];
 
 function App() {
@@ -215,9 +217,6 @@ function App() {
 
           <div className="hero-scroll">Scroll to explore</div>
         </section>
-
-        {/* Trusted Partners */}
-        <LogoMarquee />
 
         {/* About Section */}
         <section id="about" className="content-section">
