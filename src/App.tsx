@@ -218,9 +218,18 @@ function App() {
 
         {/* About Section */}
         <section id="about" className="content-section">
-          <div className="section-heading js-reveal">
-            <span className="section-label">About</span>
-            <h2>I create premium visual content for brands, events, and creators worldwide.</h2>
+          <div className="about-heading-row">
+            <div className="section-heading js-reveal">
+              <span className="section-label">About</span>
+              <h2>I create premium visual content for brands, events, and creators worldwide.</h2>
+            </div>
+            <div className="about-hero-image js-reveal">
+              <img
+                src="/images/hero-car.png"
+                alt="Premium visual content — motorsport and events"
+                className="about-hero-img"
+              />
+            </div>
           </div>
 
           <div className="about-layout">

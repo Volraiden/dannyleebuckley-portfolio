@@ -5,12 +5,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const partners = [
-  { name: 'FIA', logo: '/images/logos/fia.png' },
-  { name: 'Formula 1', logo: '/images/logos/fia.png' },
-  { name: 'Asian LeMans', logo: '/images/logos/fia.png' },
-  { name: '24H Series', logo: '/images/logos/fia.png' },
-  { name: 'Duneworks', logo: '/images/logos/duneworks.png' },
-  { name: 'FIA Formula', logo: '/images/logos/fia.png' },
+  { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
+  { name: '24H Series', logo: '/images/logos/24h-series.png' },
+  { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
+  { name: 'LS', logo: '/images/logos/ls.png' },
+  { name: 'Duneworks Media', logo: '/images/logos/duneworks-media.png' },
+  { name: 'D', logo: '/images/logos/d-logo.png' },
 ];
 
 export default function LogoMarquee() {

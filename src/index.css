@@ -413,6 +413,46 @@ textarea {
   color: var(--text);
 }
 
+/* About heading row: tagline left, car image right slightly lower */
+.about-heading-row {
+  display: grid;
+  grid-template-columns: 1fr min(420px, 45%);
+  gap: 48px;
+  align-items: end;
+  margin-bottom: 64px;
+}
+
+.about-heading-row .section-heading {
+  margin-bottom: 0;
+}
+
+.about-hero-image {
+  margin-top: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.about-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .about-heading-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .about-hero-image {
+    margin-top: 0;
+    max-width: 480px;
+  }
+}
+
 /* About Section */
 .about-layout {
   display: grid;
