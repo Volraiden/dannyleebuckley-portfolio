@@ -14,6 +14,8 @@ import {
   Globe,
   Menu,
   X,
+  Film,
+  Video,
 } from 'lucide-react';
 import { useLanguage } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -23,8 +25,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const serviceKeys = [
   { titleKey: 'service1Title', descKey: 'service1Desc', icon: Camera },
-  { titleKey: 'service2Title', descKey: 'service2Desc', icon: Clapperboard },
-  { titleKey: 'service3Title', descKey: 'service3Desc', icon: Code },
+  { titleKey: 'service2Title', descKey: 'service2Desc', icon: Film },
+  { titleKey: 'service3Title', descKey: 'service3Desc', icon: Video },
+  { titleKey: 'service4Title', descKey: 'service4Desc', icon: Clapperboard },
+  { titleKey: 'service5Title', descKey: 'service5Desc', icon: Code },
 ];
 
 const highlightsKeys = [
@@ -60,6 +64,15 @@ function App() {
   const { t } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setIsLoading(false);
+    }, 2200);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -109,6 +122,62 @@ function App() {
 
   return (
     <div ref={appRef} className="site-shell">
+      <motion.div
+        className="startup-loader"
+        aria-live="polite"
+        aria-label="Site loading"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: isLoading ? 1 : 0 }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
+        style={{ pointerEvents: isLoading ? 'auto' : 'none' }}
+      >
+        <div className="startup-loader-inner">
+          <motion.p
+            className="startup-loader-kicker"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            Systems starting up
+          </motion.p>
+          <div className="startup-loader-logo-wrap">
+            <motion.div
+              className="startup-loader-ring"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+            />
+            <motion.img
+              src="/images/logos/duneworks.png"
+              alt="Duneworks logo"
+              className="startup-loader-logo"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            />
+          </div>
+          <motion.h2
+            className="startup-loader-title"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            AI systems booting
+          </motion.h2>
+          <motion.div
+            className="startup-loader-bars"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.4 }}
+          >
+            <span />
+            <span />
+            <span />
+          </motion.div>
+        </div>
+      </motion.div>
+
       {/* Header */}
       <header className="site-header">
         <motion.a 
