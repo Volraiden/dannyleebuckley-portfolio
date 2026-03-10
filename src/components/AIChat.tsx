@@ -1,44 +1,72 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, MessageCircle } from 'lucide-react';
+import { X, Send, MessageCircle, MessageSquare, Calendar, HelpCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-const DANNY_INTRO = `Hey, I'm Danny (Daniel Lee Buckley). You can chat with me here or book a session — just say you want to book and I'll walk you through it (name, location, when you want it, etc.). I'll then send the details straight to Daniel so he can get back to you. What do you need?`;
-
+type Intent = 'chat' | 'booking' | 'support' | null;
 type Message = { role: 'user' | 'assistant'; content: string };
+type BookingPayload = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  date?: string;
+  sessionType?: string;
+  notes?: string;
+};
 
 type AIChatProps = {
   open: boolean;
   onClose: () => void;
 };
 
+const INTENT_OPTIONS: { id: Intent; label: string; icon: typeof MessageSquare }[] = [
+  { id: 'chat', label: 'Just chat', icon: MessageSquare },
+  { id: 'booking', label: 'Booking', icon: Calendar },
+  { id: 'support', label: 'Support', icon: HelpCircle },
+];
+
+const INTRO_BY_INTENT: Record<NonNullable<Intent>, string> = {
+  chat: "Hey, I'm Danny — here to chat. Ask me about the site, Daniel's work, or whatever.",
+  booking: "Let's get you booked. I'll need your name, email, phone, location, when you want the session, and what type (photo, video, etc.). What's your name?",
+  support: "Hey, I'm Danny. Having an issue or question? Tell me what's up and I'll point you in the right direction.",
+};
+
+const DANNY_REACH_BACK =
+  "All set — I've sent your details to Daniel. He'll reach out to you via a call or email to confirm the session.";
+
 export function AIChat({ open, onClose }: AIChatProps) {
   const { t } = useLanguage();
+  const [intent, setIntent] = useState<Intent>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState<BookingPayload | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const showIntro = messages.length === 0;
+  const showIntentPicker = intent === null;
+  const showIntro = intent !== null && messages.length === 0;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, showIntro]);
+  }, [messages, showIntro, pendingBooking]);
 
-  const sendMessage = async () => {
-    const text = input.trim();
+  const sendMessage = async (textOverride?: string) => {
+    const text = (textOverride ?? input.trim()).trim();
     if (!text || loading) return;
 
-    setInput('');
+    if (!textOverride) setInput('');
     const userMsg: Message = { role: 'user', content: text };
     setMessages((m) => [...m, userMsg]);
     setLoading(true);
+    setPendingBooking(null);
 
     try {
       const res = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          intent,
           messages: [...messages, userMsg].map(({ role, content }) => ({ role, content })),
         }),
       });
@@ -55,42 +83,7 @@ export function AIChat({ open, onClose }: AIChatProps) {
       setMessages((m) => [...m, { role: 'assistant', content: reply }]);
 
       if (data.booking) {
-        try {
-          const bookingRes = await fetch('/.netlify/functions/submit-booking', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data.booking),
-          });
-          const bookingData = await bookingRes.json().catch(() => ({}));
-          if (!bookingRes.ok || bookingData.ok === false) {
-            setMessages((m) => [
-              ...m,
-              {
-                role: 'assistant',
-                content:
-                  "I tried to email Daniel your booking but it didn't fully go through. Copy your details and send them to Danielleebuckley@gmail.com so nothing gets lost.",
-              },
-            ]);
-          } else {
-            setMessages((m) => [
-              ...m,
-              {
-                role: 'assistant',
-                content:
-                  "Got you — I’ve sent your booking details straight to Daniel’s email. He’ll hit you back to lock in the session.",
-              },
-            ]);
-          }
-        } catch {
-          setMessages((m) => [
-            ...m,
-            {
-              role: 'assistant',
-              content:
-                "I couldn't auto-email your booking — copy what you sent and email it to Danielleebuckley@gmail.com so he definitely sees it.",
-            },
-          ]);
-        }
+        setPendingBooking(data.booking);
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Unknown error';
@@ -99,7 +92,8 @@ export function AIChat({ open, onClose }: AIChatProps) {
       const isConfigError = msg.includes("isn't set up") || msg.includes('DEEPSEEK');
       let content: string;
       if (isNotFound) {
-        content = "AI chat only works when the site is deployed on Netlify (or when you run \"netlify dev\" locally). Right now the chat server isn't available — email Daniel directly or try on the live site.";
+        content =
+          'AI chat only works when the site is deployed on Netlify (or when you run "netlify dev" locally). Right now the chat server isn\'t available — email Daniel directly or try on the live site.';
       } else if (isConfigError) {
         content = msg;
       } else {
@@ -109,6 +103,54 @@ export function AIChat({ open, onClose }: AIChatProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const confirmBooking = async () => {
+    if (!pendingBooking) return;
+    setLoading(true);
+    try {
+      const bookingRes = await fetch('/.netlify/functions/submit-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pendingBooking),
+      });
+      const bookingData = await bookingRes.json().catch(() => ({}));
+      if (!bookingRes.ok || bookingData.ok === false) {
+        setMessages((m) => [
+          ...m,
+          {
+            role: 'assistant',
+            content:
+              "I tried to email Daniel your booking but it didn't go through. Please email Danielleebuckley@gmail.com with your details so nothing gets lost.",
+          },
+        ]);
+      } else {
+        setMessages((m) => [...m, { role: 'assistant', content: DANNY_REACH_BACK }]);
+      }
+    } catch {
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          content:
+            "Couldn't send the booking automatically. Please email your details to Danielleebuckley@gmail.com.",
+        },
+      ]);
+    } finally {
+      setPendingBooking(null);
+      setLoading(false);
+    }
+  };
+
+  const requestBookingEdit = () => {
+    setPendingBooking(null);
+    setMessages((m) => [
+      ...m,
+      {
+        role: 'assistant',
+        content: "No worries — tell me what you'd like to change and I'll update it.",
+      },
+    ]);
   };
 
   return (
@@ -144,14 +186,36 @@ export function AIChat({ open, onClose }: AIChatProps) {
             </div>
 
             <div className="ai-chat-messages">
-              {showIntro && (
-                <div className="ai-chat-message assistant">
-                  <div className="ai-chat-avatar">D</div>
-                  <div className="ai-chat-bubble">
-                    <p>{DANNY_INTRO}</p>
+              {showIntentPicker && (
+                <div className="ai-chat-intent-wrap">
+                  <p className="ai-chat-intent-kicker">Hey, I&apos;m Danny. What do you need?</p>
+                  <div className="ai-chat-intent-buttons">
+                    {INTENT_OPTIONS.map((opt) => (
+                      <motion.button
+                        key={opt.id}
+                        type="button"
+                        className="ai-chat-intent-btn"
+                        onClick={() => setIntent(opt.id)}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <opt.icon size={20} />
+                        <span>{opt.label}</span>
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
               )}
+
+              {showIntro && intent && (
+                <div className="ai-chat-message assistant">
+                  <div className="ai-chat-avatar">D</div>
+                  <div className="ai-chat-bubble">
+                    <p>{INTRO_BY_INTENT[intent]}</p>
+                  </div>
+                </div>
+              )}
+
               {messages.map((msg, i) => (
                 <div key={i} className={`ai-chat-message ${msg.role}`}>
                   {msg.role === 'assistant' && <div className="ai-chat-avatar">D</div>}
@@ -160,33 +224,114 @@ export function AIChat({ open, onClose }: AIChatProps) {
                   </div>
                 </div>
               ))}
+
+              {pendingBooking && (
+                <div className="ai-chat-booking-confirm">
+                  <p className="ai-chat-booking-confirm-title">Confirm your details</p>
+                  <dl className="ai-chat-booking-details">
+                    {pendingBooking.name && (
+                      <>
+                        <dt>Name</dt>
+                        <dd>{pendingBooking.name}</dd>
+                      </>
+                    )}
+                    {pendingBooking.email && (
+                      <>
+                        <dt>Email</dt>
+                        <dd>{pendingBooking.email}</dd>
+                      </>
+                    )}
+                    {pendingBooking.phone && (
+                      <>
+                        <dt>Phone</dt>
+                        <dd>{pendingBooking.phone}</dd>
+                      </>
+                    )}
+                    {pendingBooking.location && (
+                      <>
+                        <dt>Location</dt>
+                        <dd>{pendingBooking.location}</dd>
+                      </>
+                    )}
+                    {pendingBooking.date && (
+                      <>
+                        <dt>Date / time</dt>
+                        <dd>{pendingBooking.date}</dd>
+                      </>
+                    )}
+                    {pendingBooking.sessionType && (
+                      <>
+                        <dt>Session type</dt>
+                        <dd>{pendingBooking.sessionType}</dd>
+                      </>
+                    )}
+                    {pendingBooking.notes && (
+                      <>
+                        <dt>Notes</dt>
+                        <dd>{pendingBooking.notes}</dd>
+                      </>
+                    )}
+                  </dl>
+                  <p className="ai-chat-booking-note">Daniel will reach back to you via a call or email.</p>
+                  <div className="ai-chat-booking-actions">
+                    <motion.button
+                      type="button"
+                      className="ai-chat-booking-btn confirm"
+                      onClick={confirmBooking}
+                      disabled={loading}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Info is correct
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      className="ai-chat-booking-btn edit"
+                      onClick={requestBookingEdit}
+                      disabled={loading}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Needs editing
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
               {loading && (
                 <div className="ai-chat-message assistant">
                   <div className="ai-chat-avatar">D</div>
                   <div className="ai-chat-bubble ai-chat-typing">
-                    <span>.</span><span>.</span><span>.</span>
+                    <span>.</span>
+                    <span>.</span>
+                    <span>.</span>
                   </div>
                 </div>
               )}
               <div ref={bottomRef} />
             </div>
 
-            <form
-              className="ai-chat-form"
-              onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-            >
-              <input
-                type="text"
-                className="ai-chat-input"
-                placeholder="Type a message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={loading}
-              />
-              <button type="submit" className="ai-chat-send" disabled={loading || !input.trim()}>
-                <Send size={18} />
-              </button>
-            </form>
+            {!showIntentPicker && (
+              <form
+                className="ai-chat-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendMessage();
+                }}
+              >
+                <input
+                  type="text"
+                  className="ai-chat-input"
+                  placeholder="Type a message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={loading}
+                />
+                <button type="submit" className="ai-chat-send" disabled={loading || !input.trim()}>
+                  <Send size={18} />
+                </button>
+              </form>
+            )}
           </motion.aside>
         )}
       </AnimatePresence>

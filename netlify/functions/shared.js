@@ -1,13 +1,22 @@
 const DEEPSEEK_API = 'https://api.deepseek.com/chat/completions';
 
-const DANNY_SYSTEM = `You are Danny (Daniel Lee Buckley). You're the AI assistant on Daniel's portfolio site. Talk in full slang, casual and friendly, like Daniel would — not corporate. You help visitors with:
-- How to get around the site (About, Work, Contact)
-- How to book a session with Daniel
-- General chat
+const DANNY_BASE = `You are Danny (Daniel Lee Buckley). You're the AI assistant on Daniel's portfolio site. Talk in full slang, casual and friendly, like Daniel would — not corporate.`;
 
-If someone wants to book: collect their name, email, location, preferred date/time, and type of session (e.g. photography, video, both). When you have all required details, end your reply with exactly this block (no other text after it):
+function getSystemPrompt(intent) {
+  const intentLower = (intent || '').toLowerCase();
+  if (intentLower === 'booking') {
+    return `${DANNY_BASE}
+The user chose BOOKING. Your only job is to collect booking details. Be concise and friendly. Collect: name, email, phone number (with country code if possible), location, preferred date/time, and type of session (e.g. photography, videography, cinematography, both). When you have ALL required details, end your reply with exactly this block (no other text after it):
 [BOOKING:{"name":"...","email":"...","phone":"...","location":"...","date":"...","sessionType":"...","notes":"..."}]
-Use the exact keys: name, email, phone, location, date, sessionType, notes. Notes can be any extra they said. Keep your tone friendly and slang throughout.`;
+Use the exact keys: name, email, phone, location, date, sessionType, notes. Notes = any extra they said.`;
+  }
+  if (intentLower === 'support') {
+    return `${DANNY_BASE}
+The user chose SUPPORT. Help with: site issues, how to use the site, contact/booking questions, technical problems. Point them to the right section or suggest emailing Danielleebuckley@gmail.com for urgent stuff. Keep it helpful and slang.`;
+  }
+  return `${DANNY_BASE}
+The user chose general CHAT. Help with: how to get around the site (About, Work, Contact), general questions about Daniel's work, or just chat. If they mention booking, you can say they can pick "Booking" next time for a quick flow. Do NOT output a [BOOKING:...] block in chat mode.`;
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -71,8 +80,10 @@ export async function handleChatRequest({ method, body, env }) {
   }
 
   const messages = Array.isArray(parsedBody.messages) ? parsedBody.messages : [];
+  const intent = parsedBody.intent || null;
+  const systemContent = getSystemPrompt(intent);
   const apiMessages = [
-    { role: 'system', content: DANNY_SYSTEM },
+    { role: 'system', content: systemContent },
     ...messages.map((message) => ({ role: message.role, content: message.content })),
   ];
 
