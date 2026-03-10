@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Send,
   Globe,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useLanguage } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
@@ -19,52 +21,22 @@ import { AIChat } from './components/AIChat';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const services = [
-  {
-    title: 'Photography',
-    description:
-      'I shoot event coverage, portraits, brand campaigns, and documentary-style storytelling across any genre.',
-    icon: Camera,
-  },
-  {
-    title: 'Cinematic Video',
-    description:
-      'I create commercial edits, event recaps, branded films, and polished social-first content.',
-    icon: Clapperboard,
-  },
-  {
-    title: 'Development',
-    description:
-      'I build websites, software, and systems — from portfolio sites to custom applications and creative tools.',
-    icon: Code,
-  },
+const serviceKeys = [
+  { titleKey: 'service1Title', descKey: 'service1Desc', icon: Camera },
+  { titleKey: 'service2Title', descKey: 'service2Desc', icon: Clapperboard },
+  { titleKey: 'service3Title', descKey: 'service3Desc', icon: Code },
 ];
 
-const highlights = [
-  { value: '6', label: 'Years Experience' },
-  { value: '50+', label: 'Events Covered' },
-  { value: '50K+', label: 'Photos Captured' },
+const highlightsKeys = [
+  { value: '6', labelKey: 'stat1Label' },
+  { value: '50+', labelKey: 'stat2Label' },
+  { value: '50K+', labelKey: 'stat3Label' },
 ];
 
-const featuredWork = [
-  {
-    title: 'Event Coverage',
-    category: 'Live Production',
-    copy:
-      'I deliver fast-paced storytelling for events, brands, partners, and media channels.',
-  },
-  {
-    title: 'Brand Films',
-    category: 'Commercial Production',
-    copy:
-      'I create cinematic visual campaigns that blend motion, sound, and performance.',
-  },
-  {
-    title: 'Web Development',
-    category: 'Development',
-    copy:
-      'I build websites, applications, and digital systems for creative professionals and brands.',
-  },
+const featuredWorkKeys = [
+  { titleKey: 'featured1Title', categoryKey: 'featured1Category', copyKey: 'featured1Copy' },
+  { titleKey: 'featured2Title', categoryKey: 'featured2Category', copyKey: 'featured2Copy' },
+  { titleKey: 'featured3Title', categoryKey: 'featured3Category', copyKey: 'featured3Copy' },
 ];
 
 // Client logos - all companies I've worked with (Trusted By grid)
@@ -87,6 +59,7 @@ function App() {
   const appRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -152,7 +125,7 @@ function App() {
           <span className="wordmark-text">DANIEL LEE BUCKLEY</span>
         </motion.a>
 
-        <nav className="site-nav" aria-label="Primary">
+        <nav className="site-nav site-nav-desk" aria-label="Primary">
           <a href="#about">{t('navAbout')}</a>
           <a href="#work">{t('navWork')}</a>
           <a href="#contact">{t('navContact')}</a>
@@ -165,17 +138,45 @@ function App() {
           </button>
         </nav>
 
-        <LanguageSwitcher />
-
-        <motion.a 
-          className="header-cta" 
-          href="#contact"
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          {t('bookProject')}
-        </motion.a>
+        <div className="site-header-right">
+          <LanguageSwitcher />
+          <motion.a 
+            className="header-cta" 
+            href="#contact"
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {t('bookProject')}
+          </motion.a>
+          <button
+            type="button"
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen((o) => !o)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </header>
+
+      {/* Mobile menu */}
+      <div className={`mobile-menu ${mobileMenuOpen ? 'mobile-menu-open' : ''}`} aria-hidden={!mobileMenuOpen}>
+        <nav className="mobile-nav" aria-label="Mobile">
+          <a href="#about" onClick={() => setMobileMenuOpen(false)}>{t('navAbout')}</a>
+          <a href="#work" onClick={() => setMobileMenuOpen(false)}>{t('navWork')}</a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>{t('navContact')}</a>
+          <button type="button" onClick={() => { setChatOpen(true); setMobileMenuOpen(false); }}>
+            {t('navAIChat')}
+          </button>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-cta">
+            {t('bookProject')}
+          </a>
+        </nav>
+        <div className="mobile-menu-lang">
+          <LanguageSwitcher />
+        </div>
+      </div>
 
       <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
 
@@ -189,6 +190,8 @@ function App() {
               loop
               playsInline
               className="hero-video"
+              poster="/images/logos/duneworks.png"
+              preload="auto"
             >
               <source src="/videos/hero.mp4" type="video/mp4" />
             </video>
@@ -207,8 +210,7 @@ function App() {
             </h1>
 
             <p className="hero-subtitle">
-              Professional photographer, filmmaker, and developer creating
-              world-class visual content, websites, and digital systems.
+              {t('heroSubtitle')}
             </p>
 
             <div className="hero-actions">
@@ -239,7 +241,7 @@ function App() {
           <div className="about-heading-row">
             <div className="section-heading js-reveal">
               <span className="section-label">{t('sectionAbout')}</span>
-              <h2>I create premium visual content for brands, events, and creators worldwide.</h2>
+              <h2>{t('aboutHeading')}</h2>
             </div>
             <div className="about-hero-image js-reveal">
               <img
@@ -252,22 +254,14 @@ function App() {
 
           <div className="about-layout">
             <div className="about-copy js-reveal">
-              <p>
-                Based in Uzbekistan and originally from Australia, I build high-end visuals
-                across commercial production, events, and digital content. I also develop
-                websites, software, and systems for creative professionals and brands.
-              </p>
-              <p>
-                From fast-paced event environments to branded media campaigns and web development,
-                I focus on making projects feel cinematic, sharp, and professionally executed
-                without losing clarity or creative vision.
-              </p>
+              <p>{t('aboutPara1')}</p>
+              <p>{t('aboutPara2')}</p>
             </div>
 
             <div className="stats-grid js-reveal">
-              {highlights.map((item, index) => (
+              {highlightsKeys.map((item, index) => (
                 <motion.div 
-                  key={item.label} 
+                  key={item.labelKey} 
                   className="stat-card-clean"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -276,7 +270,7 @@ function App() {
                   whileHover={{ y: -4, scale: 1.02 }}
                 >
                   <span>{item.value}</span>
-                  <p>{item.label}</p>
+                  <p>{t(item.labelKey)}</p>
                 </motion.div>
               ))}
             </div>
@@ -287,13 +281,13 @@ function App() {
         <section id="work" className="content-section">
           <div className="section-heading js-reveal">
             <span className="section-label">{t('sectionWork')}</span>
-            <h2>I build premium visual content across photo, film, and digital delivery.</h2>
+            <h2>{t('workHeading')}</h2>
           </div>
 
           <div className="service-grid stagger-grid">
-            {services.map((service) => (
+            {serviceKeys.map((service) => (
               <motion.article
-                key={service.title}
+                key={service.titleKey}
                 className="studio-card stagger-item"
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.4 }}
@@ -301,23 +295,23 @@ function App() {
                 <div className="studio-card-icon">
                   <service.icon size={22} />
                 </div>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
+                <h3>{t(service.titleKey)}</h3>
+                <p>{t(service.descKey)}</p>
               </motion.article>
             ))}
           </div>
 
           <div className="featured-grid stagger-grid">
-            {featuredWork.map((item) => (
+            {featuredWorkKeys.map((item) => (
               <motion.article
-                key={item.title}
+                key={item.titleKey}
                 className="featured-card stagger-item"
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.4 }}
               >
-                <span>{item.category}</span>
-                <h3>{item.title}</h3>
-                <p>{item.copy}</p>
+                <span>{t(item.categoryKey)}</span>
+                <h3>{t(item.titleKey)}</h3>
+                <p>{t(item.copyKey)}</p>
                 <motion.a 
                   href="https://instagram.com/Buckley.lens"
                   target="_blank"
@@ -325,7 +319,7 @@ function App() {
                   className="featured-link"
                   whileHover={{ x: 4 }}
                 >
-                  <span>View on Instagram</span>
+                  <span>{t('viewOnInstagram')}</span>
                   <ExternalLink size={14} />
                 </motion.a>
               </motion.article>
@@ -336,7 +330,7 @@ function App() {
           <div className="clients-section">
             <div className="clients-header js-reveal">
               <h3>{t('trustedBy')}</h3>
-              <p>Companies and brands I&apos;ve had the privilege to work with</p>
+              <p>{t('clientsSubtext')}</p>
             </div>
 
             <div className="clients-grid stagger-grid">
@@ -373,12 +367,9 @@ function App() {
                 <img src="/images/logos/duneworks.png" alt="Duneworks" />
               </div>
               <div className="duneworks-text">
-                <span className="duneworks-label">CEO & Founder</span>
+                <span className="duneworks-label">{t('duneworksLabel')}</span>
                 <h3>Duneworks</h3>
-                <p>
-                  Leading Duneworks Studios, Duneworks Productions, and The Dune Network — 
-                  a creative ecosystem spanning photography, film production, and professional networking across Central Asia.
-                </p>
+                <p>{t('duneworksDesc')}</p>
                 <motion.a 
                   href="https://duneworksproductions.com"
                   target="_blank"
@@ -468,7 +459,7 @@ function App() {
           >
             <div className="contact-form-header">
               <h3>{t('getInTouch')}</h3>
-              <p>Select the reason for your message and I&apos;ll get back to you as soon as possible.</p>
+              <p>{t('contactFormIntro')}</p>
             </div>
 
             <form 
@@ -502,12 +493,12 @@ function App() {
               <div className="form-group">
                 <label htmlFor="category">{t('reasonContact')}</label>
                 <select id="category" name="category" required>
-                  <option value="">Select a reason...</option>
-                  <option value="work">Work With Me - I want to hire you for a project</option>
-                  <option value="job">Join My Team - I&apos;m interested in working for you</option>
-                  <option value="bug">Report a Bug - Something&apos;s wrong with the website</option>
-                  <option value="collab">Collaboration - Let&apos;s work together</option>
-                  <option value="other">Other - Something else</option>
+                  <option value="">{t('selectReasonPlaceholder')}</option>
+                  <option value="work">{t('optionWork')}</option>
+                  <option value="job">{t('optionJob')}</option>
+                  <option value="bug">{t('optionBug')}</option>
+                  <option value="collab">{t('optionCollab')}</option>
+                  <option value="other">{t('optionOther')}</option>
                 </select>
               </div>
 
@@ -517,7 +508,7 @@ function App() {
                   id="message" 
                   name="message" 
                   rows={5} 
-                  placeholder="Tell me about your project, the bug you found, or why you want to join the team..."
+                  placeholder={t('messagePlaceholder')}
                   required
                 />
               </div>
@@ -533,7 +524,7 @@ function App() {
               </motion.button>
 
               <p className="form-note">
-                Your message will be sent directly to my email. I typically respond within 24-48 hours.
+                {t('formNote')}
               </p>
             </form>
           </motion.div>

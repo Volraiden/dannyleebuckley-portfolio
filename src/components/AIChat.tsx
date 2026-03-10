@@ -46,7 +46,9 @@ export function AIChat({ open, onClose }: AIChatProps) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = data.error || data.message || (typeof data === 'string' ? data : res.statusText);
-        throw new Error(msg);
+        const err = new Error(msg) as Error & { status?: number };
+        err.status = res.status;
+        throw err;
       }
 
       const reply = data.reply ?? data.message ?? 'Something went wrong.';
@@ -64,10 +66,19 @@ export function AIChat({ open, onClose }: AIChatProps) {
         }
       }
     } catch (e) {
-      setMessages((m) => [
-        ...m,
-        { role: 'assistant', content: `Sorry, something went wrong: ${e instanceof Error ? e.message : 'Unknown error'}. Try again or email Daniel directly.` },
-      ]);
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      const status = (e as Error & { status?: number }).status;
+      const isNotFound = status === 404 || msg.includes('Not Found');
+      const isConfigError = msg.includes("isn't set up") || msg.includes('DEEPSEEK');
+      let content: string;
+      if (isNotFound) {
+        content = "AI chat only works when the site is deployed on Netlify (or when you run \"netlify dev\" locally). Right now the chat server isn't available — email Daniel directly or try on the live site.";
+      } else if (isConfigError) {
+        content = msg;
+      } else {
+        content = `Sorry, something went wrong: ${msg}. Try again or email Daniel directly.`;
+      }
+      setMessages((m) => [...m, { role: 'assistant', content }]);
     } finally {
       setLoading(false);
     }

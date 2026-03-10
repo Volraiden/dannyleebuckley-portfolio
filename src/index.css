@@ -143,6 +143,12 @@ textarea {
   transition: all 0.3s ease;
 }
 
+.site-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .site-nav a:hover,
 .site-nav a:focus-visible,
 .site-nav-chat:hover,
@@ -162,6 +168,25 @@ textarea {
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: var(--panel-hover);
 }
 
 .header-cta {
@@ -1096,6 +1121,68 @@ textarea {
   }
 }
 
+/* Mobile menu overlay */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  background: rgba(13, 13, 15, 0.98);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 80px 24px 40px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.mobile-menu-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-nav a,
+.mobile-nav button {
+  padding: 14px 24px;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 100px;
+  transition: background 0.2s;
+}
+
+.mobile-nav a:hover,
+.mobile-nav button:hover {
+  background: var(--panel);
+}
+
+.mobile-menu-cta {
+  margin-top: 16px;
+  background: var(--text) !important;
+  color: var(--bg) !important;
+}
+
+.mobile-menu-lang {
+  margin-top: auto;
+}
+
 @media (max-width: 768px) {
   .site-header {
     top: 16px;
@@ -1103,8 +1190,12 @@ textarea {
     padding: 10px 14px 10px 18px;
   }
 
-  .site-nav {
+  .site-nav-desk {
     display: none;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
   }
 
   .about-layout,
@@ -1130,6 +1221,21 @@ textarea {
   .duneworks-text h3 {
     font-size: 2rem;
   }
+
+  .hero-video-container,
+  .hero-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .about-hero-image,
+  .about-hero-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1139,6 +1245,14 @@ textarea {
 
   .wordmark-text {
     display: none;
+  }
+
+  .site-header-right .language-switcher {
+    display: none;
+  }
+
+  .mobile-menu-lang {
+    display: block;
   }
 
   .hero-content {
