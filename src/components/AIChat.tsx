@@ -35,6 +35,17 @@ const INTRO_BY_INTENT: Record<NonNullable<Intent>, string> = {
 const DANNY_REACH_BACK =
   "All set — I've sent your details to Daniel. He'll reach out to you via a call or email to confirm the session.";
 
+const SHOOTING_TYPE_OPTIONS = [
+  'Event',
+  'Portrait',
+  'Commercial',
+  'Brand Film',
+  'Wedding',
+  'Sports',
+  'Documentary',
+  'Other',
+];
+
 export function AIChat({ open, onClose }: AIChatProps) {
   const { t } = useLanguage();
   const [intent, setIntent] = useState<Intent>(null);
@@ -42,6 +53,8 @@ export function AIChat({ open, onClose }: AIChatProps) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [pendingBooking, setPendingBooking] = useState<BookingPayload | null>(null);
+  const [shootingTypeSelect, setShootingTypeSelect] = useState<string>('Event');
+  const [shootingTypeOther, setShootingTypeOther] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const showIntentPicker = intent === null;
@@ -50,6 +63,19 @@ export function AIChat({ open, onClose }: AIChatProps) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, showIntro, pendingBooking]);
+
+  useEffect(() => {
+    if (!pendingBooking?.sessionType) return;
+    const st = pendingBooking.sessionType.trim();
+    const match = SHOOTING_TYPE_OPTIONS.find((o) => o.toLowerCase() === st.toLowerCase());
+    if (match) {
+      setShootingTypeSelect(match);
+      setShootingTypeOther('');
+    } else {
+      setShootingTypeSelect('Other');
+      setShootingTypeOther(st);
+    }
+  }, [pendingBooking]);
 
   const sendMessage = async (textOverride?: string) => {
     const text = (textOverride ?? input.trim()).trim();
@@ -107,12 +133,15 @@ export function AIChat({ open, onClose }: AIChatProps) {
 
   const confirmBooking = async () => {
     if (!pendingBooking) return;
+    const sessionType =
+      shootingTypeSelect === 'Other' ? shootingTypeOther.trim() || 'Other' : shootingTypeSelect;
+    const payload = { ...pendingBooking, sessionType };
     setLoading(true);
     try {
       const bookingRes = await fetch('/.netlify/functions/submit-booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pendingBooking),
+        body: JSON.stringify(payload),
       });
       const bookingData = await bookingRes.json().catch(() => ({}));
       if (!bookingRes.ok || bookingData.ok === false) {
@@ -259,12 +288,6 @@ export function AIChat({ open, onClose }: AIChatProps) {
                         <dd>{pendingBooking.date}</dd>
                       </>
                     )}
-                    {pendingBooking.sessionType && (
-                      <>
-                        <dt>Session type</dt>
-                        <dd>{pendingBooking.sessionType}</dd>
-                      </>
-                    )}
                     {pendingBooking.notes && (
                       <>
                         <dt>Notes</dt>
@@ -272,6 +295,31 @@ export function AIChat({ open, onClose }: AIChatProps) {
                       </>
                     )}
                   </dl>
+                  <div className="ai-chat-booking-shooting">
+                    <label htmlFor="ai-chat-shooting-type">Type of shooting</label>
+                    <select
+                      id="ai-chat-shooting-type"
+                      className="ai-chat-shooting-select"
+                      value={shootingTypeSelect}
+                      onChange={(e) => setShootingTypeSelect(e.target.value)}
+                    >
+                      {SHOOTING_TYPE_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                    {shootingTypeSelect === 'Other' && (
+                      <input
+                        type="text"
+                        className="ai-chat-shooting-other"
+                        placeholder="Specify type of shooting..."
+                        value={shootingTypeOther}
+                        onChange={(e) => setShootingTypeOther(e.target.value)}
+                        aria-label="Custom type of shooting"
+                      />
+                    )}
+                  </div>
                   <p className="ai-chat-booking-note">Daniel will reach back to you via a call or email.</p>
                   <div className="ai-chat-booking-actions">
                     <motion.button

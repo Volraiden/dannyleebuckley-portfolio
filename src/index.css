@@ -1799,6 +1799,54 @@ textarea {
   color: var(--text);
 }
 
+.ai-chat-booking-shooting {
+  margin: 0 0 14px;
+}
+
+.ai-chat-booking-shooting label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ai-chat-shooting-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.ai-chat-shooting-select:focus {
+  outline: none;
+  border-color: var(--border-hover);
+}
+
+.ai-chat-shooting-other {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.ai-chat-shooting-other::placeholder {
+  color: var(--text-muted);
+}
+
+.ai-chat-shooting-other:focus {
+  outline: none;
+  border-color: var(--border-hover);
+}
+
 .ai-chat-booking-note {
   margin: 0 0 14px;
   padding: 10px 12px;
