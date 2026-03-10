@@ -123,13 +123,8 @@ export async function handleSubmitBookingRequest({ method, body, env }) {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const endpoint = env.FORMSPREE_BOOKING_ENDPOINT;
-  if (!endpoint) {
-    return jsonResponse(200, {
-      ok: false,
-      message: 'Booking form not configured',
-    });
-  }
+  const endpoint =
+    env.FORMSPREE_BOOKING_ENDPOINT || 'https://formspree.io/f/xqeypano';
 
   let parsedBody;
   try {

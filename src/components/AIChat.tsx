@@ -56,13 +56,40 @@ export function AIChat({ open, onClose }: AIChatProps) {
 
       if (data.booking) {
         try {
-          await fetch('/.netlify/functions/submit-booking', {
+          const bookingRes = await fetch('/.netlify/functions/submit-booking', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data.booking),
           });
+          const bookingData = await bookingRes.json().catch(() => ({}));
+          if (!bookingRes.ok || bookingData.ok === false) {
+            setMessages((m) => [
+              ...m,
+              {
+                role: 'assistant',
+                content:
+                  "I tried to email Daniel your booking but it didn't fully go through. Copy your details and send them to Danielleebuckley@gmail.com so nothing gets lost.",
+              },
+            ]);
+          } else {
+            setMessages((m) => [
+              ...m,
+              {
+                role: 'assistant',
+                content:
+                  "Got you — I’ve sent your booking details straight to Daniel’s email. He’ll hit you back to lock in the session.",
+              },
+            ]);
+          }
         } catch {
-          // non-blocking
+          setMessages((m) => [
+            ...m,
+            {
+              role: 'assistant',
+              content:
+                "I couldn't auto-email your booking — copy what you sent and email it to Danielleebuckley@gmail.com so he definitely sees it.",
+            },
+          ]);
         }
       }
     } catch (e) {
