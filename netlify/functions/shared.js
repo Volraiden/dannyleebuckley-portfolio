@@ -6,8 +6,8 @@ const DANNY_SYSTEM = `You are Danny (Daniel Lee Buckley). You're the AI assistan
 - General chat
 
 If someone wants to book: collect their name, email, location, preferred date/time, and type of session (e.g. photography, video, both). When you have all required details, end your reply with exactly this block (no other text after it):
-[BOOKING:{"name":"...","email":"...","location":"...","date":"...","sessionType":"...","notes":"..."}]
-Use the exact keys: name, email, location, date, sessionType, notes. Notes can be any extra they said. Keep your tone friendly and slang throughout.`;
+[BOOKING:{"name":"...","email":"...","phone":"...","location":"...","date":"...","sessionType":"...","notes":"..."}]
+Use the exact keys: name, email, phone, location, date, sessionType, notes. Notes can be any extra they said. Keep your tone friendly and slang throughout.`;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -133,10 +133,11 @@ export async function handleSubmitBookingRequest({ method, body, env }) {
     return { statusCode: 400, body: 'Invalid JSON' };
   }
 
-  const { name, email, location, date, sessionType, notes } = parsedBody;
+  const { name, email, phone, location, date, sessionType, notes } = parsedBody;
   const payload = new URLSearchParams({
     name: name || '',
     email: email || '',
+    phone: phone || '',
     location: location || '',
     date: date || '',
     sessionType: sessionType || '',
