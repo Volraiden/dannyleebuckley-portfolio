@@ -33,7 +33,13 @@ exports.handler = async function (event, context) {
 
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    return { statusCode: 500, body: 'DEEPSEEK_API_KEY not configured' };
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({
+        error: 'AI chat isn\'t set up yet. Add DEEPSEEK_API_KEY in Netlify (Site configuration → Environment variables), then redeploy. Or email Daniel directly.',
+      }),
+    };
   }
 
   let body;

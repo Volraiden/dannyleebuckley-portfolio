@@ -43,12 +43,12 @@ export function AIChat({ open, onClose }: AIChatProps) {
         }),
       });
 
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || res.statusText);
+        const msg = data.error || data.message || (typeof data === 'string' ? data : res.statusText);
+        throw new Error(msg);
       }
 
-      const data = await res.json();
       const reply = data.reply ?? data.message ?? 'Something went wrong.';
       setMessages((m) => [...m, { role: 'assistant', content: reply }]);
 

@@ -473,7 +473,7 @@ function App() {
 
             <form 
               className="contact-form"
-              action="https://formspree.io/f/YOUR_FORM_ID"
+              action="https://formspree.io/f/xqeypano"
               method="POST"
             >
               <div className="form-row">
