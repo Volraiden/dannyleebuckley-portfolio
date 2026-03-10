@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,6 +13,9 @@ import {
   Send,
   Globe,
 } from 'lucide-react';
+import { useLanguage } from './context/LanguageContext';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { AIChat } from './components/AIChat';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -82,6 +85,8 @@ const clientLogos = [
 
 function App() {
   const appRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -148,10 +153,19 @@ function App() {
         </motion.a>
 
         <nav className="site-nav" aria-label="Primary">
-          <a href="#about">About</a>
-          <a href="#work">Work</a>
-          <a href="#contact">Contact</a>
+          <a href="#about">{t('navAbout')}</a>
+          <a href="#work">{t('navWork')}</a>
+          <a href="#contact">{t('navContact')}</a>
+          <button
+            type="button"
+            className="site-nav-chat"
+            onClick={() => setChatOpen(true)}
+          >
+            {t('navAIChat')}
+          </button>
         </nav>
+
+        <LanguageSwitcher />
 
         <motion.a 
           className="header-cta" 
@@ -159,9 +173,11 @@ function App() {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.98 }}
         >
-          Book a Project
+          {t('bookProject')}
         </motion.a>
       </header>
+
+      <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
 
       <main>
         {/* Hero Section with Video */}
@@ -202,7 +218,7 @@ function App() {
                 whileHover={{ y: -3, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                View My Work
+                {t('viewMyWork')}
               </motion.a>
               <motion.a 
                 className="button-secondary" 
@@ -210,19 +226,19 @@ function App() {
                 whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Get in Touch
+                {t('getInTouch')}
               </motion.a>
             </div>
           </div>
 
-          <div className="hero-scroll">Scroll to explore</div>
+          <div className="hero-scroll">{t('scrollExplore')}</div>
         </section>
 
         {/* About Section */}
         <section id="about" className="content-section">
           <div className="about-heading-row">
             <div className="section-heading js-reveal">
-              <span className="section-label">About</span>
+              <span className="section-label">{t('sectionAbout')}</span>
               <h2>I create premium visual content for brands, events, and creators worldwide.</h2>
             </div>
             <div className="about-hero-image js-reveal">
@@ -270,7 +286,7 @@ function App() {
         {/* Work Section */}
         <section id="work" className="content-section">
           <div className="section-heading js-reveal">
-            <span className="section-label">Work</span>
+            <span className="section-label">{t('sectionWork')}</span>
             <h2>I build premium visual content across photo, film, and digital delivery.</h2>
           </div>
 
@@ -319,7 +335,7 @@ function App() {
           {/* Client Logos */}
           <div className="clients-section">
             <div className="clients-header js-reveal">
-              <h3>Trusted By</h3>
+              <h3>{t('trustedBy')}</h3>
               <p>Companies and brands I&apos;ve had the privilege to work with</p>
             </div>
 
@@ -372,7 +388,7 @@ function App() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Globe size={18} />
-                  <span>Visit Website</span>
+                  <span>{t('visitWebsite')}</span>
                   <ExternalLink size={14} />
                 </motion.a>
               </div>
@@ -383,8 +399,8 @@ function App() {
         {/* Contact Section */}
         <section id="contact" className="content-section">
           <div className="section-heading js-reveal">
-            <span className="section-label">Contact</span>
-            <h2>Let&apos;s work together.</h2>
+            <span className="section-label">{t('sectionContact')}</span>
+            <h2>{t('getInTouchHeading')}</h2>
           </div>
 
           {/* Social Links - Prominent */}
@@ -405,7 +421,7 @@ function App() {
             >
               <Instagram size={28} />
               <div className="social-btn-text">
-                <span className="social-label">Follow on Instagram</span>
+                <span className="social-label">{t('followInstagram')}</span>
                 <span className="social-handle">@Buckley.lens</span>
               </div>
               <ExternalLink size={16} className="social-arrow" />
@@ -421,7 +437,7 @@ function App() {
             >
               <Youtube size={28} />
               <div className="social-btn-text">
-                <span className="social-label">Subscribe on YouTube</span>
+                <span className="social-label">{t('subscribeYouTube')}</span>
                 <span className="social-handle">@Volraiden</span>
               </div>
               <ExternalLink size={16} className="social-arrow" />
@@ -435,7 +451,7 @@ function App() {
             >
               <Mail size={28} />
               <div className="social-btn-text">
-                <span className="social-label">Send me an email</span>
+                <span className="social-label">{t('sendEmail')}</span>
                 <span className="social-handle">Danielleebuckley@gmail.com</span>
               </div>
               <ExternalLink size={16} className="social-arrow" />
@@ -451,7 +467,7 @@ function App() {
             viewport={{ once: true }}
           >
             <div className="contact-form-header">
-              <h3>Get in Touch</h3>
+              <h3>{t('getInTouch')}</h3>
               <p>Select the reason for your message and I&apos;ll get back to you as soon as possible.</p>
             </div>
 
@@ -462,29 +478,29 @@ function App() {
             >
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="name">Your Name</label>
+                  <label htmlFor="name">{t('yourName')}</label>
                   <input 
                     type="text" 
                     id="name" 
                     name="name" 
-                    placeholder="John Doe"
+                    placeholder="Mr. Arslan Gay"
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="email">Your Email</label>
+                  <label htmlFor="email">{t('yourEmail')}</label>
                   <input 
                     type="email" 
                     id="email" 
                     name="email" 
-                    placeholder="john@example.com"
+                    placeholder="arslan@example.com"
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group">
-                <label htmlFor="category">Reason for Contact</label>
+                <label htmlFor="category">{t('reasonContact')}</label>
                 <select id="category" name="category" required>
                   <option value="">Select a reason...</option>
                   <option value="work">Work With Me - I want to hire you for a project</option>
@@ -496,7 +512,7 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="message">Your Message</label>
+                <label htmlFor="message">{t('yourMessage')}</label>
                 <textarea 
                   id="message" 
                   name="message" 
@@ -513,7 +529,7 @@ function App() {
                 whileTap={{ scale: 0.98 }}
               >
                 <Send size={18} />
-                <span>Send Message</span>
+                <span>{t('sendMessage')}</span>
               </motion.button>
 
               <p className="form-note">

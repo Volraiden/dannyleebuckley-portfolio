@@ -1,0 +1,157 @@
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Send, MessageCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+
+const DANNY_INTRO = `Hey, I'm Danny (Daniel Lee Buckley). You can chat with me here or book a session — just say you want to book and I'll walk you through it (name, location, when you want it, etc.). I'll then send the details straight to Daniel so he can get back to you. What do you need?`;
+
+type Message = { role: 'user' | 'assistant'; content: string };
+
+type AIChatProps = {
+  open: boolean;
+  onClose: () => void;
+};
+
+export function AIChat({ open, onClose }: AIChatProps) {
+  const { t } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const showIntro = messages.length === 0;
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, showIntro]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    setInput('');
+    const userMsg: Message = { role: 'user', content: text };
+    setMessages((m) => [...m, userMsg]);
+    setLoading(true);
+
+    try {
+      const res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMsg].map(({ role, content }) => ({ role, content })),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || res.statusText);
+      }
+
+      const data = await res.json();
+      const reply = data.reply ?? data.message ?? 'Something went wrong.';
+      setMessages((m) => [...m, { role: 'assistant', content: reply }]);
+
+      if (data.booking) {
+        try {
+          await fetch('/.netlify/functions/submit-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data.booking),
+          });
+        } catch {
+          // non-blocking
+        }
+      }
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        { role: 'assistant', content: `Sorry, something went wrong: ${e instanceof Error ? e.message : 'Unknown error'}. Try again or email Daniel directly.` },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="ai-chat-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {open && (
+          <motion.aside
+            className="ai-chat-panel"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.3 }}
+          >
+            <div className="ai-chat-header">
+              <div className="ai-chat-title">
+                <MessageCircle size={22} />
+                <span>{t('navAIChat')}</span>
+              </div>
+              <button type="button" className="ai-chat-close" onClick={onClose} aria-label="Close chat">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="ai-chat-messages">
+              {showIntro && (
+                <div className="ai-chat-message assistant">
+                  <div className="ai-chat-avatar">D</div>
+                  <div className="ai-chat-bubble">
+                    <p>{DANNY_INTRO}</p>
+                  </div>
+                </div>
+              )}
+              {messages.map((msg, i) => (
+                <div key={i} className={`ai-chat-message ${msg.role}`}>
+                  {msg.role === 'assistant' && <div className="ai-chat-avatar">D</div>}
+                  <div className="ai-chat-bubble">
+                    <p>{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+              {loading && (
+                <div className="ai-chat-message assistant">
+                  <div className="ai-chat-avatar">D</div>
+                  <div className="ai-chat-bubble ai-chat-typing">
+                    <span>.</span><span>.</span><span>.</span>
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            <form
+              className="ai-chat-form"
+              onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+            >
+              <input
+                type="text"
+                className="ai-chat-input"
+                placeholder="Type a message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={loading}
+              />
+              <button type="submit" className="ai-chat-send" disabled={loading || !input.trim()}>
+                <Send size={18} />
+              </button>
+            </form>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
