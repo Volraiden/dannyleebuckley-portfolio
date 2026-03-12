@@ -34,8 +34,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     sendEmail: 'Send me an email',
     heroSubtitle: 'Professional photographer, filmmaker, and developer creating world-class visual content, websites, and digital systems.',
     aboutHeading: 'I create premium visual content for brands, events, and creators worldwide.',
-    aboutPara1: 'Based in Uzbekistan and originally from Australia, I build high-end visuals across commercial production, events, and digital content. I also develop websites, software, and systems for creative professionals and brands.',
-    aboutPara2: 'From fast-paced event environments to branded media campaigns and web development, I focus on making projects feel cinematic, sharp, and professionally executed without losing clarity or creative vision.',
+    aboutPara1:
+      'Based in Uzbekistan and originally from Australia, I build high-end visuals across commercial production, events, and digital content. I also develop websites, software, and systems for creative professionals and brands.',
+    aboutPara2:
+      'On set I work across big commercial productions and brand campaigns — including media work for Kapital Bank — keeping everything cinematic, sharp, and professionally executed while still feeling real.',
     workHeading: 'I build premium visual content across photo, film, and digital delivery.',
     service1Title: 'Photography',
     service1Desc: 'I shoot event coverage, portraits, brand campaigns, and documentary-style storytelling across any genre.',
@@ -98,8 +100,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     sendEmail: 'Написать на email',
     heroSubtitle: 'Фотограф, режиссёр и разработчик. Создаю визуальный контент, сайты и цифровые системы мирового уровня.',
     aboutHeading: 'Я создаю премиальный визуальный контент для брендов, мероприятий и авторов по всему миру.',
-    aboutPara1: 'Живу в Узбекистане, родом из Австралии. Делаю визуал для коммерческих проектов, мероприятий и цифрового контента. Также разрабатываю сайты, ПО и системы для креативщиков и брендов.',
-    aboutPara2: 'От быстрых съёмок на мероприятиях до рекламных кампаний и веб-разработки — делаю проекты кинематографичными, чёткими и профессиональными, без потери ясности и идеи.',
+    aboutPara1:
+      'Живу в Узбекистане, родом из Австралии. Делаю визуал для коммерческих проектов, мероприятий и цифрового контента. Также разрабатываю сайты, ПО и системы для креативщиков и брендов.',
+    aboutPara2:
+      'От быстрых съёмок на мероприятиях до крупных рекламных сетов и бренд-кампаний (в том числе как медиа для крупных банков и компаний) — делаю проекты кинематографичными, чёткими и профессиональными, без потери идеи.',
     workHeading: 'Создаю премиальный визуальный контент: фото, кино и цифровая подача.',
     service1Title: 'Фотография',
     service1Desc: 'Съёмка мероприятий, портреты, рекламные кампании и документальный сторителлинг в любом жанре.',
@@ -158,8 +162,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     sendEmail: 'Email yozish',
     heroSubtitle: 'Professional fotograf, rejissor va dasturchi. Brendlar, tadbirlar va yaratuvchilar uchun vizual kontent, saytlar va raqamli tizimlar yarataman.',
     aboutHeading: 'Brendlar, tadbirlar va butun dunyo yaratuvchilari uchun premium vizual kontent yarataman.',
-    aboutPara1: "O'zbekistonda yashayman, avstraliyalikman. Reklama, tadbirlar va raqamli kontent uchun vizual ishlar qilaman. Shuningdek, kreativchilar va brendlar uchun saytlar, dasturiy ta'minot va tizimlar yarataman.",
-    aboutPara2: "Tez tadbir muhitlaridan brendli media kampaniyalar va veb-ishlab chiqishgacha — loyihalarni kinematografik, aniq va professional qilishga intilaman.",
+    aboutPara1:
+      \"O'zbekistonda yashayman, avstraliyalikman. Reklama, tadbirlar va raqamli kontent uchun vizual ishlar qilaman. Shuningdek, kreativchilar va brendlar uchun saytlar, dasturiy ta'minot va tizimlar yarataman.\",
+    aboutPara2:
+      \"Tez tadbir muhitlaridan yirik reklama setlari va brend kampaniyalarigacha — (jumladan yirik bank va kompaniyalar uchun media sifatida) loyihalarni kinematografik, aniq va professional qilishga intilaman.\",
     workHeading: 'Foto, film va raqamli yetkazib berish bo\'yicha premium vizual kontent yarataman.',
     service1Title: 'Fotografiya',
     service1Desc: 'Tadbir yoritish, portretlar, brend kampaniyalari va hujjatli hikoyalar — barcha janrlar.',
@@ -222,8 +228,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     sendEmail: 'إرسال بريد',
     heroSubtitle: 'مصور ومخرج ومطور. أنشئ محتوى بصرياً ومواقع وأنظمة رقمية عالمية المستوى.',
     aboutHeading: 'أُنشئ محتوى بصرياً متميزاً للعلامات والفعاليات والمبدعين حول العالم.',
-    aboutPara1: 'مقيم في أوزبكستان ومن أستراليا. أعمل في الإنتاج التجاري والفعاليات والمحتوى الرقمي. وأطور المواقع والبرمجيات للعاملين بالإبداع والعلامات.',
-    aboutPara2: 'من بيئات الفعاليات السريعة إلى الحملات الإعلامية والويب، أركز على جعل المشاريع سينمائية وواضحة واحترافية.',
+    aboutPara1:
+      'مقيم في أوزبكستان ومن أستراليا. أعمل في الإنتاج التجاري والفعاليات والمحتوى الرقمي. وأطور المواقع والبرمجيات للعاملين بالإبداع والعلامات.',
+    aboutPara2:
+      'من بيئات الفعاليات السريعة إلى جلسات الإعلانات الكبيرة وحملات العلامات — بما في ذلك العمل كإعلام لعلامات وبنوك كبرى — أركز على جعل المشاريع سينمائية وواضحة واحترافية.',
     workHeading: 'أبني محتوى بصرياً متميزاً في الصورة والفيديو والتسليم الرقمي.',
     service1Title: 'التصوير',
     service1Desc: 'تغطية فعاليات، صور شخصية، حملات علامات وقصص وثائقية بأي نوع.',
@@ -286,8 +294,10 @@ export const translations: Record<Locale, Record<string, string>> = {
     sendEmail: 'E-posta gönder',
     heroSubtitle: 'Profesyonel fotoğrafçı, yönetmen ve geliştirici. Dünya çapında görsel içerik, web siteleri ve dijital sistemler üretiyorum.',
     aboutHeading: 'Markalar, etkinlikler ve yaratıcılar için premium görsel içerik üretiyorum.',
-    aboutPara1: 'Özbekistan\'da yaşıyorum, Avustralya kökenliyim. Ticari prodüksiyon, etkinlikler ve dijital içerikte görsel işler yapıyorum. Ayrıca yaratıcılar ve markalar için web siteleri, yazılım ve sistemler geliştiriyorum.',
-    aboutPara2: 'Hızlı etkinlik ortamlarından markalı medya kampanyalarına ve web geliştirmeye kadar — projeleri sinematik, net ve profesyonel hissettiriyorum.',
+    aboutPara1:
+      \"Özbekistan'da yaşıyorum, Avustralya kökenliyim. Ticari prodüksiyon, etkinlikler ve dijital içerikte görsel işler yapıyorum. Ayrıca yaratıcılar ve markalar için web siteleri, yazılım ve sistemler geliştiriyorum.\",
+    aboutPara2:
+      'Hızlı etkinlik ortamlarından büyük reklam setlerine ve marka kampanyalarına kadar — (büyük bankalar ve markalar için medya olarak) projeleri sinematik, net ve profesyonel hissettiriyorum.',
     workHeading: 'Fotoğraf, film ve dijital teslimat alanında premium görsel içerik üretiyorum.',
     service1Title: 'Fotoğrafçılık',
     service1Desc: 'Etkinlik çekimi, portreler, marka kampanyaları ve belgesel anlatım — her türde.',
