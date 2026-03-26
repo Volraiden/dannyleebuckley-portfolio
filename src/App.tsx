@@ -4,6 +4,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Camera,
+  Sun,
+  Moon,
   Clapperboard,
   Code,
   CalendarDays,
@@ -53,6 +55,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [cameraDetailIndex, setCameraDetailIndex] = useState(0);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -84,6 +87,21 @@ function App() {
   ];
 
   useEffect(() => {
+    const savedTheme = window.localStorage.getItem('site-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      setTheme(savedTheme);
+      return;
+    }
+    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    setTheme(prefersLight ? 'light' : 'dark');
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    window.localStorage.setItem('site-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 768px)');
     const updateMobileState = () => setIsMobile(mediaQuery.matches);
     updateMobileState();
@@ -99,6 +117,10 @@ function App() {
 
     return () => window.clearTimeout(timer);
   }, [isMobile]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   useEffect(() => {
     if (!isMobile || !heroVideoRef.current) return;
@@ -257,6 +279,16 @@ function App() {
 
         <div className="site-header-right">
           <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="site-theme-toggle"
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+          </button>
           <motion.a 
             className="header-cta" 
             href="https://cal.com/danielleebuckley"
@@ -287,6 +319,9 @@ function App() {
           <a href="#contact" onClick={() => setMobileMenuOpen(false)}>{t('navContact')}</a>
           <button type="button" onClick={() => { setChatOpen(true); setMobileMenuOpen(false); }}>
             {t('navAIChat')}
+          </button>
+          <button type="button" className="mobile-theme-toggle" onClick={toggleTheme}>
+            {theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           </button>
           <a
             href="https://cal.com/danielleebuckley"
@@ -432,6 +467,24 @@ function App() {
           <div className="section-heading js-reveal">
             <span className="section-label">{t('sectionWork')}</span>
             <h2>{t('workHeading')}</h2>
+            <div className="work-cinematic-ui">
+              <div className="work-cinematic-row">
+                <motion.span
+                  className="work-rec-dot"
+                  animate={{ opacity: [1, 0.35, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <span className="work-rec-label">REC</span>
+                <Camera size={16} />
+                <Clapperboard size={16} />
+                <Film size={16} />
+              </div>
+              <motion.div
+                className="work-cinematic-track"
+                animate={{ backgroundPositionX: ['0%', '100%'] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+              />
+            </div>
           </div>
 
           <div className="service-grid stagger-grid">
