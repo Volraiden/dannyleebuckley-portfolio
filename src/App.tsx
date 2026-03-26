@@ -56,6 +56,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [cameraDetailIndex, setCameraDetailIndex] = useState(0);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [selectedPartner, setSelectedPartner] = useState<{ name: string; logo: string } | null>(null);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -569,7 +570,12 @@ function App() {
               <div className="camera-trusted-track">
                 <div className="camera-trusted-row">
                   {[...clientLogos, ...clientLogos].map((client, index) => (
-                    <div key={`${client.name}-${index}`} className="camera-trusted-logo">
+                    <button
+                      key={`${client.name}-${index}`}
+                      type="button"
+                      className="camera-trusted-logo"
+                      onClick={() => setSelectedPartner(client)}
+                    >
                       {brokenLogos[client.name] ? (
                         <span className="client-logo-fallback">{client.name}</span>
                       ) : (
@@ -588,11 +594,32 @@ function App() {
                           }
                         />
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
+
+            {selectedPartner && (
+              <div className="partner-viewfinder js-reveal">
+                <div className="partner-viewfinder-top">
+                  <span className="camera-trusted-dot" />
+                  <span className="camera-trusted-label">Focus Monitor</span>
+                  <button
+                    type="button"
+                    className="partner-viewfinder-close"
+                    onClick={() => setSelectedPartner(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="partner-viewfinder-screen">
+                  <div className="partner-viewfinder-corners" aria-hidden="true" />
+                  <img src={selectedPartner.logo} alt={selectedPartner.name} className="partner-viewfinder-logo" />
+                </div>
+                <p className="partner-viewfinder-name">{selectedPartner.name}</p>
+              </div>
+            )}
 
             <div className="mini-booking-card js-reveal">
               <p className="mini-booking-kicker">Available for bookings</p>
@@ -608,6 +635,29 @@ function App() {
               >
                 Book Me on Cal.com
               </a>
+            </div>
+          </div>
+
+          <div className="ai-chat-preview js-reveal">
+            <div className="ai-chat-preview-top">
+              <p className="mini-booking-kicker">AI Assistant Preview</p>
+              <button type="button" className="mini-booking-btn" onClick={() => setChatOpen(true)}>
+                Open AI Chat
+              </button>
+            </div>
+            <div className="ai-chat-preview-body" onClick={() => setChatOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setChatOpen(true);
+              }
+            }}>
+              <div className="ai-preview-bubble user">Can I book you for an event shoot next week?</div>
+              <div className="ai-preview-bubble bot">Absolutely. Share date and location, then I can guide you to booking.</div>
+              <div className="ai-preview-bubble user">Dubai, motorsport content.</div>
+              <div className="ai-preview-bubble bot">Perfect fit. Tap below and I will open full AI chat + booking flow.</div>
+              <button type="button" className="ai-preview-input" onClick={() => setChatOpen(true)}>
+                Type to chat with AI assistant...
+              </button>
             </div>
           </div>
 
