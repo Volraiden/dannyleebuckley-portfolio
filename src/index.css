@@ -1462,6 +1462,7 @@ textarea {
   background-size: 100% 6px;
   opacity: 0.18;
   animation: cameraScan 6s linear infinite;
+  pointer-events: none; /* Allow interacting with the strip scrollbar */
 }
 
 .camera-controls {
