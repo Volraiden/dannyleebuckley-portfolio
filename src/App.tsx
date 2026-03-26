@@ -24,6 +24,34 @@ import { useLanguage } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { AIChat } from './components/AIChat';
 
+function TypewriterText({ text, speed = 30 }: { text: string; speed?: number }) {
+  const [displayText, setDisplayText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setDisplayText('');
+    setIsComplete(false);
+    let index = 0;
+    const interval = window.setInterval(() => {
+      if (index < text.length) {
+        setDisplayText(text.slice(0, index + 1));
+        index++;
+      } else {
+        setIsComplete(true);
+        window.clearInterval(interval);
+      }
+    }, speed);
+    return () => window.clearInterval(interval);
+  }, [text, speed]);
+
+  return (
+    <span className={`typewriter-text ${isComplete ? 'complete' : ''}`}>
+      {displayText}
+      {!isComplete && <span className="typewriter-cursor">|</span>}
+    </span>
+  );
+}
+
 gsap.registerPlugin(ScrollTrigger);
 
 const serviceKeys = [
@@ -57,6 +85,41 @@ function App() {
   const [cameraDetailIndex, setCameraDetailIndex] = useState(0);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedPartner, setSelectedPartner] = useState<{ name: string; logo: string } | null>(null);
+  const [chatMessages, setChatMessages] = useState<{ type: 'user' | 'bot'; text: string }[]>([]);
+  const [chatStep, setChatStep] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [showInputCursor, setShowInputCursor] = useState(true);
+
+  const chatDemoSequence = [
+    { type: 'user' as const, text: 'Can I book you for an event shoot next week?' },
+    { type: 'bot' as const, text: 'Absolutely! I specialize in motorsport and brand events. What location?' },
+    { type: 'user' as const, text: 'Dubai, Formula racing content.' },
+    { type: 'bot' as const, text: 'Perfect fit! 🏎️ I will open the full AI chat where we can discuss dates, deliverables, and pricing.' },
+  ];
+
+  useEffect(() => {
+    let timeout: number;
+    const runSequence = () => {
+      if (chatStep < chatDemoSequence.length) {
+        setIsTyping(true);
+        timeout = window.setTimeout(() => {
+          setChatMessages((prev) => [...prev, chatDemoSequence[chatStep]]);
+          setIsTyping(false);
+          setChatStep((prev) => prev + 1);
+        }, 1200);
+      }
+    };
+    runSequence();
+    return () => window.clearTimeout(timeout);
+  }, [chatStep]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setShowInputCursor((prev) => !prev);
+    }, 530);
+    return () => window.clearInterval(interval);
+  }, []);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -601,24 +664,59 @@ function App() {
             </div>
 
             {selectedPartner && (
-              <div className="partner-viewfinder js-reveal">
-                <div className="partner-viewfinder-top">
-                  <span className="camera-trusted-dot" />
-                  <span className="camera-trusted-label">Focus Monitor</span>
-                  <button
-                    type="button"
-                    className="partner-viewfinder-close"
-                    onClick={() => setSelectedPartner(null)}
-                  >
-                    Close
-                  </button>
-                </div>
-                <div className="partner-viewfinder-screen">
-                  <div className="partner-viewfinder-corners" aria-hidden="true" />
-                  <img src={selectedPartner.logo} alt={selectedPartner.name} className="partner-viewfinder-logo" />
-                </div>
-                <p className="partner-viewfinder-name">{selectedPartner.name}</p>
-              </div>
+              <motion.div
+                className="partner-viewfinder-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedPartner(null)}
+              >
+                <motion.div
+                  className="partner-viewfinder-modal"
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.85, opacity: 0 }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="partner-viewfinder-header">
+                    <div className="partner-viewfinder-status">
+                      <span className="partner-vf-dot" />
+                      <span className="partner-vf-label">FOCUS MONITOR</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="partner-viewfinder-close"
+                      onClick={() => setSelectedPartner(null)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="partner-viewfinder-body">
+                    <div className="partner-viewfinder-screen">
+                      <div className="partner-viewfinder-frame">
+                        <div className="partner-vf-corner tl" />
+                        <div className="partner-vf-corner tr" />
+                        <div className="partner-vf-corner bl" />
+                        <div className="partner-vf-corner br" />
+                        <div className="partner-vf-crosshair h" />
+                        <div className="partner-vf-crosshair v" />
+                      </div>
+                      <img
+                        src={selectedPartner.logo}
+                        alt={selectedPartner.name}
+                        className="partner-viewfinder-logo"
+                      />
+                      <div className="partner-vf-overlay">
+                        <span className="partner-vf-rec">● REC</span>
+                        <span className="partner-vf-focal">50mm f/1.4</span>
+                      </div>
+                    </div>
+                    <p className="partner-viewfinder-name">{selectedPartner.name}</p>
+                    <p className="partner-viewfinder-meta">Trusted Partner • 4K LOGO</p>
+                  </div>
+                </motion.div>
+              </motion.div>
             )}
 
             <div className="mini-booking-card js-reveal">
@@ -640,23 +738,53 @@ function App() {
 
           <div className="ai-chat-preview js-reveal">
             <div className="ai-chat-preview-top">
-              <p className="mini-booking-kicker">AI Assistant Preview</p>
+              <div className="ai-preview-header">
+                <div className="ai-preview-avatar">AI</div>
+                <div>
+                  <p className="ai-preview-title">Daniel&apos;s AI Assistant</p>
+                  <p className="ai-preview-status">
+                    <span className="ai-status-dot" />
+                    Online now
+                  </p>
+                </div>
+              </div>
               <button type="button" className="mini-booking-btn" onClick={() => setChatOpen(true)}>
-                Open AI Chat
+                Open Chat
               </button>
             </div>
-            <div className="ai-chat-preview-body" onClick={() => setChatOpen(true)} role="button" tabIndex={0} onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setChatOpen(true);
-              }
-            }}>
-              <div className="ai-preview-bubble user">Can I book you for an event shoot next week?</div>
-              <div className="ai-preview-bubble bot">Absolutely. Share date and location, then I can guide you to booking.</div>
-              <div className="ai-preview-bubble user">Dubai, motorsport content.</div>
-              <div className="ai-preview-bubble bot">Perfect fit. Tap below and I will open full AI chat + booking flow.</div>
-              <button type="button" className="ai-preview-input" onClick={() => setChatOpen(true)}>
-                Type to chat with AI assistant...
+            <div className="ai-chat-preview-body">
+              <div className="ai-preview-messages">
+                {chatMessages.map((msg, index) => (
+                  <motion.div
+                    key={index}
+                    className={`ai-message ${msg.type}`}
+                    initial={{ opacity: 0, x: msg.type === 'user' ? 20 : -20, scale: 0.9 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                  >
+                    <TypewriterText text={msg.text} />
+                  </motion.div>
+                ))}
+                {isTyping && (
+                  <motion.div
+                    className="ai-typing-indicator"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                    <span className="typing-dot" />
+                  </motion.div>
+                )}
+              </div>
+              <button
+                type="button"
+                className="ai-preview-input"
+                onClick={() => setChatOpen(true)}
+              >
+                {userInput}
+                <span className={`input-cursor ${showInputCursor ? 'visible' : ''}`}>|</span>
+                {!userInput && <span className="input-placeholder">Type to chat...</span>}
               </button>
             </div>
           </div>
