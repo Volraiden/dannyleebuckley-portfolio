@@ -70,6 +70,9 @@ function App() {
     { name: 'LS', logo: '/images/logos/ls.png' },
     { name: 'Duneworks Media', logo: '/images/logos/duneworks-media.png' },
     { name: 'D Logo', logo: '/images/logos/d-logo.png' },
+    { name: 'Trusted Partner 1', logo: '/images/logos/new-trusted-1.png' },
+    { name: 'Trusted Partner 2', logo: '/images/logos/new-trusted-2.png' },
+    { name: 'Trusted Partner 3', logo: '/images/logos/new-trusted-3.webp' },
   ];
   const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
 
