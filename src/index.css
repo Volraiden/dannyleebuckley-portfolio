@@ -827,18 +827,75 @@ textarea {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
   padding: 28px 18px 20px;
 }
 
+/* Racing car that drives around the cinema cards */
+.cinema-racing-car {
+  position: absolute;
+  width: 60px;
+  height: 30px;
+  z-index: 100;
+  pointer-events: none;
+  animation: raceAround 8s linear infinite;
+}
+
+.cinema-racing-car svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes raceAround {
+  0% {
+    top: -15px;
+    left: -30px;
+    transform: rotate(0deg);
+  }
+  25% {
+    top: -15px;
+    left: calc(100% - 30px);
+    transform: rotate(0deg);
+  }
+  26% {
+    transform: rotate(90deg);
+  }
+  50% {
+    top: calc(100% - 15px);
+    left: calc(100% - 30px);
+    transform: rotate(90deg);
+  }
+  51% {
+    transform: rotate(180deg);
+  }
+  75% {
+    top: calc(100% - 15px);
+    left: -30px;
+    transform: rotate(180deg);
+  }
+  76% {
+    transform: rotate(270deg);
+  }
+  99% {
+    top: -15px;
+    left: -30px;
+    transform: rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .cinema-card {
-  padding: 24px 22px 28px 22px;
-  border-radius: 16px;
+  padding: 16px 18px 18px 18px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  min-height: 140px;
 }
 
 /* Movie grain effect on cinema cards */
@@ -883,26 +940,39 @@ textarea {
 }
 
 .cinema-card h3 {
-  margin: 10px 0 8px;
+  margin: 8px 0 6px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   letter-spacing: 0.02em;
 }
 
-.cinema-card p {
-  margin: 12px 0 8px 0;
+.cinema-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
   color: var(--text-secondary);
-  font-size: 0.92rem;
-  line-height: 1.7;
-  padding: 0 4px 16px 4px;
+}
+
+.cinema-card p {
+  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 0;
 }
 
 .cinema-card-kicker {
   display: inline-block;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: var(--text-muted);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -1277,16 +1347,16 @@ textarea {
   z-index: 2;
   text-align: center;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
   letter-spacing: 0.05em;
   color: #f4f4f5;
   text-transform: uppercase;
   position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  padding: 0 10px;
+  top: 30%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  padding: 0 16px;
 }
 
 .camera-screen-lines {
