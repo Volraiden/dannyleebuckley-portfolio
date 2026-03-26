@@ -487,46 +487,55 @@ function App() {
             </div>
           </div>
 
-          <div className="service-grid stagger-grid">
-            {serviceKeys.map((service) => (
-              <motion.article
-                key={service.titleKey}
-                className="studio-card stagger-item"
-                whileHover={{ y: -8, scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div className="studio-card-icon">
-                  <service.icon size={22} />
-                </div>
-                <h3>{t(service.titleKey)}</h3>
-                <p>{t(service.descKey)}</p>
-              </motion.article>
-            ))}
-          </div>
+          <div className="cinema-room js-reveal">
+            <div className="cinema-room-topbar">
+              <span className="cinema-pill">Cinema Room</span>
+              <span className="cinema-pill imax">IMAX</span>
+              <span className="cinema-pill">Dolby Atmos</span>
+            </div>
 
-          <div className="featured-grid stagger-grid">
-            {featuredWorkKeys.map((item) => (
-              <motion.article
-                key={item.titleKey}
-                className="featured-card stagger-item"
-                whileHover={{ y: -8, scale: 1.02 }}
-                transition={{ duration: 0.4 }}
-              >
-                <span>{t(item.categoryKey)}</span>
-                <h3>{t(item.titleKey)}</h3>
-                <p>{t(item.copyKey)}</p>
-                <motion.a 
-                  href="https://instagram.com/Buckley.lens"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="featured-link"
-                  whileHover={{ x: 4 }}
-                >
-                  <span>{t('viewOnInstagram')}</span>
-                  <ExternalLink size={14} />
-                </motion.a>
-              </motion.article>
-            ))}
+            <div className="cinema-room-screen">
+              <div className="cinema-room-glow" />
+              <div className="cinema-room-grid">
+                {serviceKeys.map((service) => (
+                  <motion.article
+                    key={service.titleKey}
+                    className="cinema-card"
+                    whileHover={{ y: -6 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <div className="studio-card-icon">
+                      <service.icon size={20} />
+                    </div>
+                    <h3>{t(service.titleKey)}</h3>
+                    <p>{t(service.descKey)}</p>
+                  </motion.article>
+                ))}
+
+                {featuredWorkKeys.map((item) => (
+                  <motion.article
+                    key={item.titleKey}
+                    className="cinema-card featured"
+                    whileHover={{ y: -6 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <span className="cinema-card-kicker">{t(item.categoryKey)}</span>
+                    <h3>{t(item.titleKey)}</h3>
+                    <p>{t(item.copyKey)}</p>
+                    <motion.a
+                      href="https://instagram.com/Buckley.lens"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="featured-link"
+                      whileHover={{ x: 4 }}
+                    >
+                      <span>{t('viewOnInstagram')}</span>
+                      <ExternalLink size={14} />
+                    </motion.a>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Client Logos */}

@@ -712,6 +712,97 @@ textarea {
   background-size: 200% 100%;
 }
 
+.cinema-room {
+  margin-top: 26px;
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  padding: 18px;
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-elevated));
+  box-shadow: var(--shadow-lg);
+}
+
+.cinema-room-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cinema-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.cinema-pill.imax {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.cinema-room-screen {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent),
+    var(--bg);
+  overflow: hidden;
+}
+
+.cinema-room-glow {
+  position: absolute;
+  inset: -30% -20%;
+  background: radial-gradient(circle at 50% 0%, rgba(80, 110, 255, 0.2), transparent 60%);
+  pointer-events: none;
+}
+
+.cinema-room-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.cinema-card {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+}
+
+.cinema-card h3 {
+  margin: 10px 0 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+}
+
+.cinema-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.cinema-card-kicker {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* About heading row: tagline left, car image right slightly lower */
 .about-heading-row {
   display: grid;
@@ -844,6 +935,10 @@ textarea {
 
   .camera-screen {
     min-height: 170px;
+  }
+
+  .cinema-room-grid {
+    grid-template-columns: 1fr;
   }
 }
 
