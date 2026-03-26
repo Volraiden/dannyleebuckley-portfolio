@@ -837,6 +837,49 @@ textarea {
   border: 1px solid var(--border);
   background: var(--bg-card);
   backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Movie grain effect on cinema cards */
+.cinema-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: cardGrain 0.3s steps(8) infinite;
+}
+
+@keyframes cardGrain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1%, -1%); }
+  20% { transform: translate(1%, 1%); }
+  30% { transform: translate(-1%, 1%); }
+  40% { transform: translate(1%, -1%); }
+  50% { transform: translate(-1%, 2%); }
+  60% { transform: translate(2%, -1%); }
+  70% { transform: translate(-1%, -1%); }
+  80% { transform: translate(1%, 1%); }
+  90% { transform: translate(0%, 1%); }
+}
+
+.cinema-card h3,
+.cinema-card p,
+.cinema-card-kicker {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cinematic text shadow for movie feel */
+.cinema-card h3 {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.cinema-card p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .cinema-card h3 {
@@ -1013,6 +1056,120 @@ textarea {
   92% { opacity: 0; }
   93% { opacity: 0.01; }
   94% { opacity: 0; }
+}
+
+/* Racing Car Scene Bars */
+.cinema-racing-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: linear-gradient(180deg,
+    rgba(10, 10, 15, 0.98) 0%,
+    rgba(20, 20, 30, 0.95) 50%,
+    rgba(10, 10, 15, 0.98) 100%
+  );
+  z-index: 10;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cinema-racing-bar.top {
+  top: 0;
+  border-bottom: 2px solid;
+  border-image: linear-gradient(90deg, #dc2626, #ffffff, #000000) 1;
+}
+
+.cinema-racing-bar.bottom {
+  bottom: 0;
+  border-top: 2px solid;
+  border-image: linear-gradient(90deg, #dc2626, #ffffff, #000000) 1;
+}
+
+.racing-stripe-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  display: flex;
+}
+
+.racing-stripe {
+  flex: 1;
+  height: 100%;
+}
+
+.racing-stripe.red { background: #dc2626; }
+.racing-stripe.white { background: #f5f5f5; }
+.racing-stripe.black { background: #0a0a0a; }
+
+.cinema-racing-bar.top .racing-stripe-container {
+  bottom: 0;
+}
+
+.cinema-racing-bar.bottom .racing-stripe-container {
+  top: 0;
+}
+
+.racing-speed-lines {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.speed-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent
+  );
+  width: 80px;
+}
+
+.cinema-racing-bar.top .speed-line:nth-child(1) { top: 8px; }
+.cinema-racing-bar.top .speed-line:nth-child(2) { top: 15px; }
+.cinema-racing-bar.top .speed-line:nth-child(3) { top: 22px; }
+.cinema-racing-bar.top .speed-line:nth-child(4) { top: 29px; }
+.cinema-racing-bar.top .speed-line:nth-child(5) { top: 36px; }
+.cinema-racing-bar.top .speed-line:nth-child(6) { top: 12px; }
+.cinema-racing-bar.top .speed-line:nth-child(7) { top: 19px; }
+.cinema-racing-bar.top .speed-line:nth-child(8) { top: 26px; }
+
+.cinema-racing-bar.bottom .speed-line:nth-child(1) { top: 8px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(2) { top: 15px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(3) { top: 22px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(4) { top: 29px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(5) { top: 36px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(6) { top: 12px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(7) { top: 19px; }
+.cinema-racing-bar.bottom .speed-line:nth-child(8) { top: 26px; }
+
+.racing-text {
+  position: absolute;
+  left: 20px;
+  font-family: 'Bebas Neue', monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  color: #dc2626;
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+}
+
+.racing-telemetry {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  gap: 20px;
+}
+
+.telemetry-item {
+  font-family: 'Bebas Neue', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 :root[data-theme='light'] .cinema-room-screen {
@@ -1358,31 +1515,645 @@ textarea {
   transform: translateX(4px);
 }
 
-/* Client Logos Section */
+/* Camera Monitor for Trusted By Section */
+.camera-monitor-trusted {
+  margin-bottom: 30px;
+  background: linear-gradient(180deg, #1a1a22, #0f0f14);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Camera Shoulder / Handle */
+.cam-shoulder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, #252530, #1a1a25);
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cam-shoulder-pad {
+  width: 80px;
+  height: 12px;
+  background: repeating-linear-gradient(
+    90deg,
+    #2a2a35 0px,
+    #1f1f28 2px,
+    #2a2a35 4px
+  );
+  border-radius: 6px;
+}
+
+.cam-recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cam-rec-dot {
+  width: 10px;
+  height: 10px;
+  background: #ff3333;
+  border-radius: 50%;
+  animation: recPulseCamera 1s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
+}
+
+@keyframes recPulseCamera {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.cam-rec-text {
+  font-family: 'Bebas Neue', monospace;
+  font-size: 0.8rem;
+  color: #ff3333;
+  letter-spacing: 0.1em;
+}
+
+.cam-battery-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cam-bat-icon {
+  font-size: 0.9rem;
+}
+
+.cam-bat-level {
+  font-family: 'Bebas Neue', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Viewfinder / EVF Section */
+.cam-viewfinder-section {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 10;
+}
+
+.cam-viewfinder-housing {
+  background: linear-gradient(180deg, #2a2a38, #1f1f28);
+  border-radius: 16px 16px 0 0;
+  padding: 12px 16px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: none;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cam-evf-tube {
+  width: 60px;
+  height: 50px;
+  background: linear-gradient(180deg, #15151a, #0a0a0f);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #3a3a48;
+}
+
+.cam-evf-glass {
+  position: absolute;
+  inset: 4px;
+  background: linear-gradient(135deg, rgba(100, 120, 200, 0.2), rgba(80, 100, 180, 0.1));
+  border-radius: 8px;
+}
+
+.cam-evf-reflection {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 15px;
+  height: 8px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+.cam-evf-brand {
+  text-align: center;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.cam-viewfinder-mount {
+  width: 40px;
+  height: 15px;
+  background: linear-gradient(180deg, #3a3a48, #2a2a35);
+  margin-top: -1px;
+}
+
+/* Main Monitor Bezel */
+.cam-monitor-bezel {
+  background: linear-gradient(180deg, #2a2a38, #1f1f28 90%, #15151a);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.cam-monitor-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.cam-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+}
+
+.cam-model {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.cam-status-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.cam-icon {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Screen Container */
+.cam-screen-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #0a0a0f;
+}
+
+/* The Main Screen */
+.cam-screen {
+  aspect-ratio: 16/9;
+  background:
+    radial-gradient(circle at 70% 30%, rgba(80, 100, 200, 0.15), transparent 50%),
+    radial-gradient(circle at 30% 70%, rgba(100, 80, 180, 0.1), transparent 40%),
+    linear-gradient(180deg, #0a0a12 0%, #050508 100%);
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* Viewfinder Overlay on Screen */
+.cam-vf-overlay {
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+}
+
+/* Safety Frame with Corners */
+.cam-safety-frame {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.cam-safety-frame span {
+  position: absolute;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+}
+
+.corner-tl { top: -8px; left: -4px; }
+.corner-tr { top: -8px; right: -4px; }
+.corner-bl { bottom: -8px; left: -4px; }
+.corner-br { bottom: -8px; right: -4px; }
+
+/* Crosshair */
+.cam-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+}
+
+.crosshair-h {
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  top: 50%;
+}
+
+.crosshair-v {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25);
+  left: 50%;
+}
+
+.crosshair-center {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Rule of Thirds Grid */
+.cam-thirds-grid {
+  position: absolute;
+  inset: 0;
+}
+
+.third-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.third-line.v {
+  width: 1px;
+  height: 100%;
+  top: 0;
+}
+
+.third-line.v.left { left: 33.33%; }
+.third-line.v.right { left: 66.66%; }
+
+.third-line.h {
+  width: 100%;
+  height: 1px;
+  left: 0;
+}
+
+.third-line.h.top { top: 33.33%; }
+.third-line.h.bottom { top: 66.66%; }
+
+/* HUD Display */
+.cam-hud {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+}
+
+.cam-hud-top,
+.cam-hud-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hud-item {
+  font-family: 'Bebas Neue', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.hud-item.timecode {
+  color: #fff;
+  background: rgba(255, 51, 51, 0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.hud-item.format {
+  color: #4ade80;
+}
+
+/* Focus Peaking Simulation */
+.cam-focus-peaking {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.peaking-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Screen Content */
+.cam-screen-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.cam-trusted-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trusted-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.trusted-count {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: rgba(100, 200, 255, 0.8);
+}
+
+/* Monitor Controls Row */
+.cam-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+
+.cam-dial {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3a3a48, #252530);
+  border: 2px solid #4a4a58;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dial-markings {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 20deg,
+    rgba(255, 255, 255, 0.2) 20deg 22deg,
+    transparent 22deg 40deg
+  );
+}
+
+.cam-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.cam-btn-monitor {
+  padding: 6px 10px;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+}
+
+.cam-joystick {
+  width: 36px;
+  height: 36px;
+}
+
+.joystick-base {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3a3a48, #252530);
+  border: 2px solid #4a4a58;
+  display: grid;
+  place-items: center;
+}
+
+.joystick-stick {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5a5a68, #3a3a48);
+  border: 1px solid #6a6a78;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Mini Lens Section */
+.cam-lens-section-mini {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cam-lens-mount-ring {
+  width: 120px;
+  height: 16px;
+  background: linear-gradient(180deg, #2a2a35, #1a1a22);
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mount-dot-mini {
+  width: 4px;
+  height: 4px;
+  background: #444;
+  border-radius: 50%;
+}
+
+.mount-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.cam-lens-barrel-mini {
+  width: 110px;
+  height: 70px;
+  background: linear-gradient(180deg,
+    #1f1f28 0%,
+    #2a2a38 20%,
+    #1a1a22 50%,
+    #0f0f14 100%
+  );
+  border-radius: 4px 4px 30px 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lens-grip-rings {
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  right: 4px;
+}
+
+.grip-ring {
+  height: 18px;
+  background: repeating-linear-gradient(
+    90deg,
+    #1a1a22 0px,
+    #252530 2px,
+    #1a1a22 4px
+  );
+  border-radius: 2px;
+  margin-bottom: 6px;
+}
+
+.lens-glass-mini {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 24px;
+  background: linear-gradient(180deg,
+    #0a0a12 0%,
+    #151525 40%,
+    #1a1a30 60%,
+    #0f0f18 100%
+  );
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.aperture-blades-mini {
+  width: 100%;
+  height: 100%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    #1a1a30 0deg 30deg,
+    #0a0a15 30deg 60deg
+  );
+  opacity: 0.6;
+  animation: apertureRotateMini 15s linear infinite;
+}
+
+@keyframes apertureRotateMini {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.lens-reflection-mini {
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  width: 15px;
+  height: 6px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  border-radius: 50%;
+  transform: rotate(-20deg);
+}
+
+/* Light Theme Adjustments */
+:root[data-theme='light'] .camera-monitor-trusted {
+  background: linear-gradient(180deg, #e8e8f0, #d8d8e0);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+:root[data-theme='light'] .cam-shoulder {
+  background: linear-gradient(180deg, #f0f0f8, #e0e0e8);
+}
+
+:root[data-theme='light'] .cam-monitor-bezel {
+  background: linear-gradient(180deg, #f0f0f8, #e0e0e8 90%, #d0d0d8);
+}
+
+:root[data-theme='light'] .cam-screen {
+  background:
+    radial-gradient(circle at 70% 30%, rgba(100, 120, 200, 0.1), transparent 50%),
+    linear-gradient(180deg, #f8f8fc 0%, #f0f0f5 100%);
+}
+
+:root[data-theme='light'] .cam-lens-barrel-mini {
+  background: linear-gradient(180deg,
+    #e0e0e8 0%,
+    #d0d0d8 20%,
+    #c0c0c8 50%,
+    #b0b0b8 100%
+  );
+}
+
+:root[data-theme='light'] .trusted-badge {
+  color: rgba(0, 0, 0, 0.8);
+  text-shadow: none;
+}
+
+:root[data-theme='light'] .trusted-count {
+  color: rgba(59, 130, 246, 0.9);
+}
+
+/* Client Logos Section - Enhanced & Bigger */
 .clients-section {
-  margin-top: 54px;
-  padding-top: 44px;
+  margin-top: 70px;
+  padding-top: 60px;
   border-top: 1px solid var(--border);
 }
 
 .clients-header {
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 .clients-header h3 {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
+  font-size: 2.8rem;
   font-weight: 400;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   color: var(--text);
 }
 
 .clients-header p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .clients-grid {
@@ -1393,34 +2164,37 @@ textarea {
 
 .camera-trusted-strip {
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 24px;
   background: linear-gradient(180deg, var(--bg-card), var(--bg-elevated));
   overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.02);
 }
 
 .camera-trusted-top {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 10px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--panel);
 }
 
 .camera-trusted-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #ef4444;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
   animation: cameraBlink 1.2s ease-in-out infinite;
 }
 
 .camera-trusted-label {
   color: var(--text-muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .camera-trusted-track {
@@ -1431,29 +2205,37 @@ textarea {
 
 .camera-trusted-row {
   display: flex;
-  gap: 14px;
+  gap: 18px;
   width: max-content;
-  padding: 12px 14px;
-  animation: trustedMarquee 26s linear infinite;
+  padding: 18px 20px;
+  animation: trustedMarquee 30s linear infinite;
 }
 
 .camera-trusted-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 120px;
-  min-height: 70px;
-  padding: 10px 12px;
+  min-width: 160px;
+  min-height: 90px;
+  padding: 14px 18px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--bg-card);
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .camera-trusted-logo:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.02);
   border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.camera-trusted-logo img {
+  max-width: 120px;
+  max-height: 60px;
+  object-fit: contain;
 }
 
 .camera-trusted-strip:hover .camera-trusted-row {
@@ -2157,12 +2939,12 @@ textarea {
 }
 
 .ai-preview-messages {
-  min-height: 180px;
-  max-height: 220px;
+  min-height: 280px;
+  max-height: 320px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding-right: 4px;
 }
 

@@ -106,6 +106,9 @@ function App() {
     { type: 'bot' as const, text: 'Absolutely! I specialize in motorsport and brand events. What location?' },
     { type: 'user' as const, text: 'Dubai, Formula racing content.' },
     { type: 'bot' as const, text: 'Perfect fit! 🏎️ I will open the full AI chat where we can discuss dates, deliverables, and pricing.' },
+    { type: 'user' as const, text: 'What packages do you offer?' },
+    { type: 'bot' as const, text: 'I have half-day (4h) and full-day (8h) packages. Both include editing and fast turnaround.' },
+    { type: 'bot' as const, text: 'Click "Open Chat" above to see detailed pricing and availability!' },
   ];
 
   useEffect(() => {
@@ -114,10 +117,23 @@ function App() {
       if (chatStep < chatDemoSequence.length) {
         setIsTyping(true);
         timeout = window.setTimeout(() => {
-          setChatMessages((prev) => [...prev, chatDemoSequence[chatStep]]);
+          setChatMessages((prev) => {
+            const newMessages = [...prev, chatDemoSequence[chatStep]];
+            // Keep only last 6 messages to prevent overflow
+            if (newMessages.length > 6) {
+              return newMessages.slice(newMessages.length - 6);
+            }
+            return newMessages;
+          });
           setIsTyping(false);
           setChatStep((prev) => prev + 1);
-        }, 1200);
+        }, 1500);
+      } else {
+        // Loop back after delay
+        timeout = window.setTimeout(() => {
+          setChatMessages([]);
+          setChatStep(0);
+        }, 4000);
       }
     };
     runSequence();
@@ -662,20 +678,72 @@ function App() {
               <div className="cinema-projector-flicker" aria-hidden="true" />
 
               <div className="cinema-room-stage">
+                {/* Racing Car Scene Bars */}
                 <motion.div
-                  className="cinema-letterbox top"
+                  className="cinema-racing-bar top"
                   initial={{ scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
                   viewport={{ once: true }}
-                />
+                >
+                  <div className="racing-stripe-container">
+                    <div className="racing-stripe red" />
+                    <div className="racing-stripe white" />
+                    <div className="racing-stripe black" />
+                  </div>
+                  <div className="racing-speed-lines">
+                    {[...Array(8)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="speed-line"
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 400, opacity: [0, 1, 0] }}
+                        transition={{
+                          duration: 1.5 + Math.random() * 0.5,
+                          repeat: Infinity,
+                          delay: i * 0.15,
+                          ease: 'linear',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="racing-text">LAP 47/56</div>
+                </motion.div>
+
                 <motion.div
-                  className="cinema-letterbox bottom"
+                  className="cinema-racing-bar bottom"
                   initial={{ scaleX: 0 }}
                   whileInView={{ scaleX: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
                   viewport={{ once: true }}
-                />
+                >
+                  <div className="racing-stripe-container">
+                    <div className="racing-stripe red" />
+                    <div className="racing-stripe white" />
+                    <div className="racing-stripe black" />
+                  </div>
+                  <div className="racing-speed-lines">
+                    {[...Array(8)].map((_, i) => (
+                      <motion.span
+                        key={i}
+                        className="speed-line"
+                        initial={{ x: -100, opacity: 0 }}
+                        animate={{ x: 400, opacity: [0, 1, 0] }}
+                        transition={{
+                          duration: 1.5 + Math.random() * 0.5,
+                          repeat: Infinity,
+                          delay: i * 0.15 + 0.5,
+                          ease: 'linear',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="racing-telemetry">
+                    <span className="telemetry-item">SPEED 287 KM/H</span>
+                    <span className="telemetry-item">RPM 12,400</span>
+                    <span className="telemetry-item">GEAR 6</span>
+                  </div>
+                </motion.div>
 
                 <div className="cinema-room-grid">
                   {serviceKeys.map((service, index) => (
@@ -764,10 +832,162 @@ function App() {
               <p>{t('clientsSubtext')}</p>
             </div>
 
+            {/* Camera Monitor with Viewfinder */}
+            <motion.div
+              className="camera-monitor-trusted js-reveal"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              {/* Camera Body Shoulder */}
+              <div className="cam-shoulder">
+                <div className="cam-shoulder-pad" />
+                <div className="cam-recording-indicator">
+                  <span className="cam-rec-dot" />
+                  <span className="cam-rec-text">REC</span>
+                </div>
+                <div className="cam-battery-indicator">
+                  <span className="cam-bat-icon">🔋</span>
+                  <span className="cam-bat-level">87%</span>
+                </div>
+              </div>
+
+              {/* Viewfinder / EVF */}
+              <div className="cam-viewfinder-section">
+                <div className="cam-viewfinder-housing">
+                  <div className="cam-evf-tube">
+                    <div className="cam-evf-glass">
+                      <div className="cam-evf-reflection" />
+                    </div>
+                  </div>
+                  <div className="cam-evf-brand">4K HDR</div>
+                </div>
+                <div className="cam-viewfinder-mount" />
+              </div>
+
+              {/* Main Monitor Screen */}
+              <div className="cam-monitor-bezel">
+                <div className="cam-monitor-brand-row">
+                  <span className="cam-brand">SONY</span>
+                  <span className="cam-model">FX6</span>
+                  <div className="cam-status-icons">
+                    <span className="cam-icon">⚡</span>
+                    <span className="cam-icon">📹</span>
+                    <span className="cam-icon">🎤</span>
+                  </div>
+                </div>
+
+                <div className="cam-screen-container">
+                  {/* Screen with viewfinder overlay */}
+                  <div className="cam-screen">
+                    {/* Professional viewfinder overlay */}
+                    <div className="cam-vf-overlay">
+                      {/* Safety zone frame */}
+                      <div className="cam-safety-frame">
+                        <span className="corner-tl">┏</span>
+                        <span className="corner-tr">┓</span>
+                        <span className="corner-bl">┗</span>
+                        <span className="corner-br">┛</span>
+                      </div>
+
+                      {/* Center crosshair */}
+                      <div className="cam-crosshair">
+                        <div className="crosshair-h" />
+                        <div className="crosshair-v" />
+                        <div className="crosshair-center" />
+                      </div>
+
+                      {/* Rule of thirds grid */}
+                      <div className="cam-thirds-grid">
+                        <div className="third-line v left" />
+                        <div className="third-line v right" />
+                        <div className="third-line h top" />
+                        <div className="third-line h bottom" />
+                      </div>
+
+                      {/* HUD Info */}
+                      <div className="cam-hud">
+                        <div className="cam-hud-top">
+                          <span className="hud-item timecode">00:45:23:18</span>
+                          <span className="hud-item format">4K 60p</span>
+                          <span className="hud-item codec">XAVC-I</span>
+                        </div>
+                        <div className="cam-hud-bottom">
+                          <span className="hud-item iris">F2.8</span>
+                          <span className="hud-item iso">ISO 800</span>
+                          <span className="hud-item shutter">1/120</span>
+                          <span className="hud-item wb">5600K</span>
+                          <span className="hud-item lut">S-LOG3</span>
+                        </div>
+                      </div>
+
+                      {/* Focus peaking simulation */}
+                      <div className="cam-focus-peaking">
+                        <svg viewBox="0 0 400 240" className="peaking-svg">
+                          <path d="M50 80 Q100 60 150 80 T250 80" stroke="#ff0000" strokeWidth="2" fill="none" strokeDasharray="4,4" opacity="0.6" />
+                          <path d="M120 150 Q180 130 240 150" stroke="#ff0000" strokeWidth="2" fill="none" strokeDasharray="4,4" opacity="0.6" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Content inside monitor - Trusted By Title */}
+                    <div className="cam-screen-content">
+                      <motion.div
+                        className="cam-trusted-title"
+                        animate={{ opacity: [0.8, 1, 0.8] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <span className="trusted-badge">{t('trustedByBadge')}</span>
+                        <span className="trusted-count">{t('brandsCount')}</span>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monitor controls */}
+                <div className="cam-controls-row">
+                  <div className="cam-dial">
+                    <div className="dial-markings" />
+                  </div>
+                  <div className="cam-buttons">
+                    <span className="cam-btn-monitor">MENU</span>
+                    <span className="cam-btn-monitor">DISPLAY</span>
+                    <span className="cam-btn-monitor">ZEBRA</span>
+                    <span className="cam-btn-monitor">PEAK</span>
+                  </div>
+                  <div className="cam-joystick">
+                    <div className="joystick-base">
+                      <div className="joystick-stick" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Camera lens mount preview */}
+              <div className="cam-lens-section-mini">
+                <div className="cam-lens-mount-ring">
+                  <span className="mount-dot-mini" />
+                  <span className="mount-label">E-MOUNT</span>
+                  <span className="mount-dot-mini" />
+                </div>
+                <div className="cam-lens-barrel-mini">
+                  <div className="lens-grip-rings">
+                    <div className="grip-ring focus" />
+                    <div className="grip-ring zoom" />
+                  </div>
+                  <div className="lens-glass-mini">
+                    <div className="aperture-blades-mini" />
+                    <div className="lens-reflection-mini" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             <div className="camera-trusted-strip">
               <div className="camera-trusted-top">
                 <span className="camera-trusted-dot" />
-                <span className="camera-trusted-label">Viewfinder</span>
+                <span className="camera-trusted-label">{t('viewfinderLabel')}</span>
               </div>
               <div className="camera-trusted-track">
                 <div className="camera-trusted-row">
