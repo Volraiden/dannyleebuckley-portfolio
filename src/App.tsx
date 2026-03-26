@@ -52,6 +52,7 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [cameraDetailIndex, setCameraDetailIndex] = useState(0);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -74,6 +75,13 @@ function App() {
     { name: 'Trusted Partner 3', logo: '/images/logos/new-trusted-3.webp' },
   ];
   const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
+  const cameraDetails = [
+    t('service1Title'),
+    t('service2Title'),
+    t('service3Title'),
+    t('service4Title'),
+    t('service5Title'),
+  ];
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 768px)');
@@ -95,6 +103,23 @@ function App() {
   useEffect(() => {
     if (!isMobile || !heroVideoRef.current) return;
     heroVideoRef.current.play().catch(() => {});
+  }, [isMobile]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setCameraDetailIndex((prev) => (prev + 1) % cameraDetails.length);
+    }, 1600);
+    return () => window.clearInterval(interval);
+  }, [cameraDetails.length]);
+
+  useEffect(() => {
+    // On mobile, preload logos so the "Trusted By" grid appears faster.
+    if (!isMobile) return;
+    clientLogos.forEach((client) => {
+      const img = new Image();
+      img.src = client.logo;
+      img.decoding = 'async';
+    });
   }, [isMobile]);
 
   useEffect(() => {
@@ -349,11 +374,31 @@ function App() {
               <h2>{t('aboutHeading')}</h2>
             </div>
             <div className="about-hero-image js-reveal">
-              <img
-                src="/images/hero-car.png"
-                alt="Premium visual content — motorsport and events"
-                className="about-hero-img"
-              />
+              <div className="camera-card" aria-hidden="true">
+                <div className="camera-body">
+                  <div className="camera-top">
+                    <span className="camera-indicator" />
+                    <span className="camera-brand">DUNE CAM</span>
+                  </div>
+                  <div className="camera-screen">
+                    <motion.div
+                      key={cameraDetails[cameraDetailIndex]}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35 }}
+                      className="camera-screen-text"
+                    >
+                      {cameraDetails[cameraDetailIndex]}
+                    </motion.div>
+                    <div className="camera-screen-lines" />
+                  </div>
+                  <div className="camera-controls">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -456,7 +501,8 @@ function App() {
                       src={client.logo}
                       alt={client.name}
                       className="client-logo-img"
-                      loading="lazy"
+                      loading={isMobile ? 'eager' : 'lazy'}
+                      fetchPriority={isMobile && index < 6 ? 'high' : 'auto'}
                       decoding="async"
                       onError={() =>
                         setBrokenLogos((prev) => ({
