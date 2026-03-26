@@ -173,62 +173,55 @@ function App() {
     };
   }, [chatMessages]);
 
-  // Slow auto-scroll for the horizontal strips.
-  // Pauses while the user is actively dragging the scrollbar/thumb.
+  // Auto-scroll (slow drift) for the horizontal strips.
+  // Pauses briefly after any user scroll/drag so it doesn't fight the user.
   useEffect(() => {
-    const setup = (el: HTMLDivElement | null, shouldRun: () => boolean) => {
+    const setup = (el: HTMLDivElement | null) => {
       if (!el) return;
 
-      let isDragging = false;
-      let rafId = 0;
-      let lastTs = performance.now();
+      let lastUserScrollTs = 0;
 
-      const onPointerDown = () => {
-        isDragging = true;
-      };
-      const onPointerUp = () => {
-        isDragging = false;
+      const markUser = () => {
+        lastUserScrollTs = Date.now();
       };
 
-      el.addEventListener('pointerdown', onPointerDown);
-      window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('pointercancel', onPointerUp);
+      // If the user grabs the scrollbar thumb, `scroll` will fire; we pause after that.
+      const onScroll = () => markUser();
+      el.addEventListener('scroll', onScroll, { passive: true });
+      el.addEventListener('pointerdown', markUser);
 
-      const tick = (ts: number) => {
-        const dt = Math.min(0.05, (ts - lastTs) / 1000); // clamp to avoid jumps
-        lastTs = ts;
+      const speedPxPerSec = 160; // noticeable but still slow
+      const intervalMs = 30;
+      const delta = (speedPxPerSec * intervalMs) / 1000;
 
-        if (!isDragging && shouldRun()) {
-          // Very small movement so it feels like a slow "camera reel" drift.
-          el.scrollLeft += 28 * dt; // px per second (visible, still slow)
+      const intervalId = window.setInterval(() => {
+        // Pause for a moment after user interaction.
+        if (Date.now() - lastUserScrollTs < 700) return;
 
-          // Loop softly instead of snapping hard to 0.
-          if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
-            el.scrollLeft = 0;
-          }
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (maxScroll <= 0) return;
+
+        el.scrollLeft += delta;
+        if (el.scrollLeft >= maxScroll - 1) {
+          el.scrollLeft = 0;
         }
-
-        rafId = window.requestAnimationFrame(tick);
-      };
-
-      rafId = window.requestAnimationFrame(tick);
+      }, intervalMs);
 
       return () => {
-        window.cancelAnimationFrame(rafId);
-        el.removeEventListener('pointerdown', onPointerDown);
-        window.removeEventListener('pointerup', onPointerUp);
-        window.removeEventListener('pointercancel', onPointerUp);
+        window.clearInterval(intervalId);
+        el.removeEventListener('scroll', onScroll);
+        el.removeEventListener('pointerdown', markUser);
       };
     };
 
-    const cleanupCamera = setup(cameraScrollContainerRef.current, () => true);
-    const cleanupTrusted = setup(trustedLogosDisplayRef.current, () => !selectedPartner);
+    const cleanupCamera = setup(cameraScrollContainerRef.current);
+    const cleanupTrusted = setup(trustedLogosDisplayRef.current);
 
     return () => {
       cleanupCamera?.();
       cleanupTrusted?.();
     };
-  }, [selectedPartner]);
+  }, []);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -775,114 +768,6 @@ function App() {
               <div className="cinema-projector-flicker" aria-hidden="true" />
 
               <div className="cinema-room-stage">
-                {/* Racing Car Scene Bars */}
-                <motion.div
-                  className="cinema-racing-bar top"
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="racing-stripe-container">
-                    <div className="racing-stripe red" />
-                    <div className="racing-stripe white" />
-                    <div className="racing-stripe black" />
-                  </div>
-                  <div className="racing-speed-lines">
-                    {[...Array(8)].map((_, i) => (
-                      <motion.span
-                        key={i}
-                        className="speed-line"
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 400, opacity: [0, 1, 0] }}
-                        transition={{
-                          duration: 1.5 + Math.random() * 0.5,
-                          repeat: Infinity,
-                          delay: i * 0.15,
-                          ease: 'linear',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="racing-text">LAP 47/56</div>
-                  {/* Static car marker for the LAP label */}
-                  <div className="cinema-lap-car" aria-hidden="true">
-                    <svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M5 35 L15 35 L20 25 L50 22 L75 24 L90 28 L95 32 L95 38 L90 42 L75 44 L50 43 L20 42 L10 40 Z"
-                        fill="#dc2626"
-                      />
-                      <path
-                        d="M35 22 L45 12 L65 12 L72 22 Z"
-                        fill="#1f1f28"
-                      />
-                      <path
-                        d="M45 14 L63 14 L70 22 L38 22 Z"
-                        fill="#3b82f6"
-                        opacity="0.6"
-                      />
-                      <circle cx="25" cy="40" r="8" fill="#111" />
-                      <circle cx="25" cy="40" r="4" fill="#444" />
-                      <circle cx="80" cy="40" r="8" fill="#111" />
-                      <circle cx="80" cy="40" r="4" fill="#444" />
-                      <ellipse cx="92" cy="30" rx="3" ry="4" fill="#fef08a" />
-                      <ellipse cx="8" cy="32" rx="2" ry="3" fill="#ef4444" />
-                      <path
-                        d="M20 30 L90 30"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        opacity="0.5"
-                      />
-                      <text
-                        x="50"
-                        y="35"
-                        fontSize="8"
-                        fill="#fff"
-                        fontWeight="bold"
-                        textAnchor="middle"
-                        fontFamily="Bebas Neue"
-                      >
-                        7
-                      </text>
-                    </svg>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  className="cinema-racing-bar bottom"
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="racing-stripe-container">
-                    <div className="racing-stripe red" />
-                    <div className="racing-stripe white" />
-                    <div className="racing-stripe black" />
-                  </div>
-                  <div className="racing-speed-lines">
-                    {[...Array(8)].map((_, i) => (
-                      <motion.span
-                        key={i}
-                        className="speed-line"
-                        initial={{ x: -100, opacity: 0 }}
-                        animate={{ x: 400, opacity: [0, 1, 0] }}
-                        transition={{
-                          duration: 1.5 + Math.random() * 0.5,
-                          repeat: Infinity,
-                          delay: i * 0.15 + 0.5,
-                          ease: 'linear',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="racing-telemetry">
-                    <span className="telemetry-item">SPEED 287 KM/H</span>
-                    <span className="telemetry-item">RPM 12,400</span>
-                    <span className="telemetry-item">GEAR 6</span>
-                  </div>
-                </motion.div>
-
                 <div className="cinema-room-grid">
                   {/* Racing car driving around the cards */}
                   {serviceKeys.map((service, index) => (
