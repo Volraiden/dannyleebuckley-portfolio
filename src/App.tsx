@@ -24,30 +24,40 @@ import { useLanguage } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { AIChat } from './components/AIChat';
 
-function TypewriterText({ text, speed = 30 }: { text: string; speed?: number }) {
+function TypewriterText({ text, speed = 25, delay = 0 }: { text: string; speed?: number; delay?: number }) {
   const [displayText, setDisplayText] = useState('');
   const [isComplete, setIsComplete] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setDisplayText('');
     setIsComplete(false);
-    let index = 0;
-    const interval = window.setInterval(() => {
-      if (index < text.length) {
-        setDisplayText(text.slice(0, index + 1));
-        index++;
-      } else {
-        setIsComplete(true);
-        window.clearInterval(interval);
-      }
-    }, speed);
-    return () => window.clearInterval(interval);
-  }, [text, speed]);
+    setIsVisible(false);
+
+    const startTimeout = window.setTimeout(() => {
+      setIsVisible(true);
+      let index = 0;
+      const interval = window.setInterval(() => {
+        if (index < text.length) {
+          setDisplayText(text.slice(0, index + 1));
+          index++;
+        } else {
+          setIsComplete(true);
+          window.clearInterval(interval);
+        }
+      }, speed);
+      return () => window.clearInterval(interval);
+    }, delay);
+
+    return () => window.clearTimeout(startTimeout);
+  }, [text, speed, delay]);
+
+  if (!isVisible) return <span className="typewriter-placeholder" />;
 
   return (
-    <span className={`typewriter-text ${isComplete ? 'complete' : ''}`}>
+    <span className={`typewriter-text ${isComplete ? 'complete' : 'typing'}`}>
       {displayText}
-      {!isComplete && <span className="typewriter-cursor">|</span>}
+      {!isComplete && <span className="typewriter-cursor" />}
     </span>
   );
 }
@@ -553,47 +563,168 @@ function App() {
             </div>
           </div>
 
-          <div className="cinema-room js-reveal">
+          <motion.div
+            className="cinema-room js-reveal"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
             <div className="cinema-room-topbar">
-              <span className="cinema-pill">Cinema Room</span>
-              <span className="cinema-pill imax">IMAX</span>
-              <span className="cinema-pill">Dolby Atmos</span>
+              <motion.span
+                className="cinema-pill"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                Cinema Room
+              </motion.span>
+              <motion.span
+                className="cinema-pill imax"
+                initial={{ opacity: 0, y: -10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                viewport={{ once: true }}
+              >
+                IMAX
+              </motion.span>
+              <motion.span
+                className="cinema-pill"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                viewport={{ once: true }}
+              >
+                Dolby Atmos
+              </motion.span>
             </div>
 
             <div className="cinema-room-screen">
-              <div className="cinema-room-glow" />
-              <div className="cinema-ambient-lights" aria-hidden="true">
-                {[...Array(8)].map((_, lightIndex) => (
-                  <span key={lightIndex} className="cinema-light" />
+              {/* Animated film grain overlay */}
+              <div className="cinema-film-grain" aria-hidden="true" />
+
+              {/* Enhanced glow with animation */}
+              <motion.div
+                className="cinema-room-glow"
+                animate={{
+                  opacity: [0.3, 0.5, 0.3],
+                  scale: [1, 1.02, 1],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+
+              {/* Animated light beams */}
+              <div className="cinema-light-beams" aria-hidden="true">
+                {[...Array(3)].map((_, i) => (
+                  <motion.span
+                    key={i}
+                    className="light-beam"
+                    initial={{ opacity: 0, rotate: -30 + i * 30 }}
+                    animate={{
+                      opacity: [0.1, 0.3, 0.1],
+                      x: [-20, 20, -20],
+                    }}
+                    transition={{
+                      duration: 6 + i * 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: i * 0.5,
+                    }}
+                  />
                 ))}
               </div>
+
+              <div className="cinema-ambient-lights" aria-hidden="true">
+                {[...Array(8)].map((_, lightIndex) => (
+                  <motion.span
+                    key={lightIndex}
+                    className="cinema-light"
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: [0.4, 0.8, 0.4],
+                    }}
+                    transition={{
+                      duration: 2 + Math.random() * 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: lightIndex * 0.2,
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Projector flicker effect */}
+              <div className="cinema-projector-flicker" aria-hidden="true" />
+
               <div className="cinema-room-stage">
-                <div className="cinema-letterbox top" />
-                <div className="cinema-letterbox bottom" />
+                <motion.div
+                  className="cinema-letterbox top"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  viewport={{ once: true }}
+                />
+                <motion.div
+                  className="cinema-letterbox bottom"
+                  initial={{ scaleX: 0 }}
+                  whileInView={{ scaleX: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  viewport={{ once: true }}
+                />
+
                 <div className="cinema-room-grid">
-                  {serviceKeys.map((service) => (
+                  {serviceKeys.map((service, index) => (
                     <motion.article
                       key={service.titleKey}
                       className="cinema-card"
-                      whileHover={{ y: -6 }}
-                      transition={{ duration: 0.25 }}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.02,
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                      }}
                     >
-                      <div className="studio-card-icon">
+                      <motion.div
+                        className="studio-card-icon"
+                        whileHover={{ rotate: 5, scale: 1.1 }}
+                        transition={{ type: 'spring', stiffness: 300 }}
+                      >
                         <service.icon size={20} />
-                      </div>
+                      </motion.div>
                       <h3>{t(service.titleKey)}</h3>
                       <p>{t(service.descKey)}</p>
                     </motion.article>
                   ))}
 
-                  {featuredWorkKeys.map((item) => (
+                  {featuredWorkKeys.map((item, index) => (
                     <motion.article
                       key={item.titleKey}
                       className="cinema-card featured"
-                      whileHover={{ y: -6 }}
-                      transition={{ duration: 0.25 }}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: (serviceKeys.length + index) * 0.1 }}
+                      viewport={{ once: true }}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.02,
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                      }}
                     >
-                      <span className="cinema-card-kicker">{t(item.categoryKey)}</span>
+                      <motion.span
+                        className="cinema-card-kicker"
+                        animate={{ opacity: [0.6, 1, 0.6] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        {t(item.categoryKey)}
+                      </motion.span>
                       <h3>{t(item.titleKey)}</h3>
                       <p>{t(item.copyKey)}</p>
                       <motion.a
@@ -610,13 +741,21 @@ function App() {
                   ))}
                 </div>
               </div>
+
               <div className="cinema-seats" aria-hidden="true">
                 {[...Array(18)].map((_, seatIndex) => (
-                  <span key={seatIndex} className="cinema-seat" />
+                  <motion.span
+                    key={seatIndex}
+                    className="cinema-seat"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: seatIndex * 0.05 }}
+                    viewport={{ once: true }}
+                  />
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Client Logos */}
           <div className="clients-section">
@@ -672,74 +811,123 @@ function App() {
                 onClick={() => setSelectedPartner(null)}
               >
                 <motion.div
-                  className="partner-viewfinder-modal"
-                  initial={{ scale: 0.85, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.85, opacity: 0 }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                  className="camera-monitor-device"
+                  initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                  transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="partner-viewfinder-header">
-                    <div className="partner-viewfinder-status">
-                      <span className="partner-vf-dot" />
-                      <span className="partner-vf-label">FOCUS MONITOR</span>
+                  {/* Camera Body Top */}
+                  <div className="camera-body-top">
+                    <div className="camera-mic-holes">
+                      {[...Array(6)].map((_, i) => (
+                        <span key={i} className="mic-hole" />
+                      ))}
                     </div>
-                    <button
-                      type="button"
-                      className="partner-viewfinder-close"
-                      onClick={() => setSelectedPartner(null)}
-                    >
-                      ✕
-                    </button>
+                    <div className="camera-shoulder" />
                   </div>
-                  <div className="partner-viewfinder-body">
-                    <div className="partner-viewfinder-screen">
-                      <div className="partner-viewfinder-frame">
-                        <div className="partner-vf-corner tl" />
-                        <div className="partner-vf-corner tr" />
-                        <div className="partner-vf-corner bl" />
-                        <div className="partner-vf-corner br" />
-                        <div className="partner-vf-crosshair h" />
-                        <div className="partner-vf-crosshair v" />
+
+                  {/* Camera Monitor Screen */}
+                  <div className="camera-monitor-screen-wrap">
+                    <div className="camera-monitor-bezel">
+                      <div className="camera-monitor-brand">SONY</div>
+                      <div className="camera-monitor-screen">
+                        {/* Viewfinder Overlay */}
+                        <div className="camera-vf-overlay">
+                          <div className="camera-vf-safety-frame" />
+                          <div className="camera-vf-center-mark" />
+                          <div className="camera-vf-rule-thirds">
+                            <div className="vf-line h top" />
+                            <div className="vf-line h bottom" />
+                            <div className="vf-line v left" />
+                            <div className="vf-line v right" />
+                          </div>
+                          <div className="camera-vf-hud">
+                            <span className="vf-hud-item vf-rec">
+                              <span className="vf-rec-dot" /> REC
+                            </span>
+                            <span className="vf-hud-item vf-timecode">00:12:34:15</span>
+                            <span className="vf-hud-item vf-fstop">f/2.8</span>
+                            <span className="vf-hud-item vf-iso">ISO 800</span>
+                            <span className="vf-hud-item vf-shutter">1/200</span>
+                            <span className="vf-hud-item vf-battery">100%</span>
+                          </div>
+                        </div>
+
+                        {/* Logo Display */}
+                        <img
+                          src={selectedPartner.logo}
+                          alt={selectedPartner.name}
+                          className="camera-monitor-logo"
+                        />
                       </div>
-                      <img
-                        src={selectedPartner.logo}
-                        alt={selectedPartner.name}
-                        className="partner-viewfinder-logo"
-                      />
-                      <div className="partner-vf-overlay">
-                        <span className="partner-vf-rec">● REC</span>
-                        <span className="partner-vf-focal">50mm f/1.4</span>
+                      <div className="camera-monitor-controls">
+                        <span className="cam-btn menu">MENU</span>
+                        <span className="cam-btn">ZEBRA</span>
+                        <span className="cam-btn">PEAK</span>
+                        <span className="cam-btn">LUT</span>
                       </div>
                     </div>
-                    <p className="partner-viewfinder-name">{selectedPartner.name}</p>
-                    <p className="partner-viewfinder-meta">Trusted Partner • 4K LOGO</p>
                   </div>
+
+                  {/* Camera Lens */}
+                  <div className="camera-lens-section">
+                    <div className="camera-lens-mount">
+                      <div className="lens-mount-ring">
+                        <span className="mount-dot" />
+                        <span className="mount-text">E-MOUNT</span>
+                        <span className="mount-dot" />
+                      </div>
+                    </div>
+                    <div className="camera-lens-body">
+                      <div className="lens-focus-ring">
+                        <div className="focus-grip" />
+                      </div>
+                      <div className="lens-zoom-ring">
+                        <div className="zoom-grip" />
+                      </div>
+                      <div className="lens-glass">
+                        <div className="lens-reflection" />
+                        <div className="lens-aperture">
+                          <div className="aperture-blades" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="lens-hood">
+                      <div className="hood-ribs">
+                        {[...Array(4)].map((_, i) => (
+                          <span key={i} className="hood-rib" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Camera Info Panel */}
+                  <div className="camera-info-panel">
+                    <p className="camera-info-name">{selectedPartner.name}</p>
+                    <p className="camera-info-meta">Trusted Partner • 4K Resolution</p>
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    className="camera-monitor-close"
+                    onClick={() => setSelectedPartner(null)}
+                  >
+                    ✕
+                  </button>
                 </motion.div>
               </motion.div>
             )}
 
-            <div className="mini-booking-card js-reveal">
-              <p className="mini-booking-kicker">Available for bookings</p>
-              <h4>Book me for your next project or call</h4>
-              <p className="mini-booking-copy">
-                Fast response for events, brand shoots, and commercial collaborations.
-              </p>
-              <a
-                href="https://cal.com/danielleebuckley"
-                target="_blank"
-                rel="noreferrer"
-                className="mini-booking-btn"
-              >
-                Book Me on Cal.com
-              </a>
-            </div>
-          </div>
-
           <div className="ai-chat-preview js-reveal">
             <div className="ai-chat-preview-top">
               <div className="ai-preview-header">
-                <div className="ai-preview-avatar">AI</div>
+                <div className="ai-preview-avatar">
+                  <span className="ai-avatar-pulse" />
+                  AI
+                </div>
                 <div>
                   <p className="ai-preview-title">Daniel&apos;s AI Assistant</p>
                   <p className="ai-preview-status">
@@ -758,18 +946,19 @@ function App() {
                   <motion.div
                     key={index}
                     className={`ai-message ${msg.type}`}
-                    initial={{ opacity: 0, x: msg.type === 'user' ? 20 : -20, scale: 0.9 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                    initial={{ opacity: 0, y: msg.type === 'user' ? 10 : 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 400 }}
                   >
-                    <TypewriterText text={msg.text} />
+                    <TypewriterText text={msg.text} delay={index === 0 ? 300 : 100} />
                   </motion.div>
                 ))}
                 {isTyping && (
                   <motion.div
                     className="ai-typing-indicator"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                   >
                     <span className="typing-dot" />
                     <span className="typing-dot" />
@@ -784,10 +973,27 @@ function App() {
               >
                 {userInput}
                 <span className={`input-cursor ${showInputCursor ? 'visible' : ''}`}>|</span>
-                {!userInput && <span className="input-placeholder">Type to chat...</span>}
+                {!userInput && <span className="input-placeholder">Click to start chatting...</span>}
               </button>
             </div>
           </div>
+
+          <div className="mini-booking-card js-reveal" style={{ marginTop: '28px' }}>
+            <p className="mini-booking-kicker">Available for bookings</p>
+            <h4>Book me for your next project or call</h4>
+            <p className="mini-booking-copy">
+              Fast response for events, brand shoots, and commercial collaborations.
+            </p>
+            <a
+              href="https://cal.com/danielleebuckley"
+              target="_blank"
+              rel="noreferrer"
+              className="mini-booking-btn"
+            >
+              Book Me on Cal.com
+            </a>
+          </div>
+        </div>
 
           {/* Duneworks CEO Section */}
           <motion.div 
