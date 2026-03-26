@@ -88,7 +88,7 @@ function App() {
   const [chatMessages, setChatMessages] = useState<{ type: 'user' | 'bot'; text: string }[]>([]);
   const [chatStep, setChatStep] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const [userInput, setUserInput] = useState('');
+  const [userInput] = useState('');
   const [showInputCursor, setShowInputCursor] = useState(true);
 
   const chatDemoSequence = [
