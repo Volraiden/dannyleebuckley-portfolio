@@ -1948,8 +1948,6 @@ textarea {
 :root[data-theme='light'] .ai-preview-avatar {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
 }
-  cursor: pointer;
-}
 
 .client-logo:hover .client-logo-img {
   transform: scale(1.08);
