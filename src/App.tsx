@@ -121,7 +121,6 @@ function App() {
         timeout = window.setTimeout(() => {
           setChatMessages((prev) => {
             const newMessages = [...prev, chatDemoSequence[chatStep]];
-            // Keep only last 6 messages to prevent overflow
             if (newMessages.length > 6) {
               return newMessages.slice(newMessages.length - 6);
             }
@@ -131,7 +130,6 @@ function App() {
           setChatStep((prev) => prev + 1);
         }, 1500);
       } else {
-        // Loop back after delay
         timeout = window.setTimeout(() => {
           setChatMessages([]);
           setChatStep(0);
@@ -149,7 +147,6 @@ function App() {
     return () => window.clearInterval(interval);
   }, []);
 
-  // Auto-scroll the AI preview as the demo messages type in.
   useEffect(() => {
     const el = aiPreviewMessagesRef.current;
     if (!el) return;
@@ -160,8 +157,6 @@ function App() {
 
     scrollToBottom();
 
-    // TypewriterText can continue rendering after `isTyping` turns off,
-    // so we keep scrolling for a short window after a new message arrives.
     const intervalId = window.setInterval(scrollToBottom, 180);
     const timeoutId = window.setTimeout(() => {
       window.clearInterval(intervalId);
@@ -173,9 +168,6 @@ function App() {
     };
   }, [chatMessages]);
 
-  // Note: Auto-scroll is now handled by CSS animations (smoother than JS).
-
-  // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
     { name: 'Client 2', logo: '/images/logos/client2.png' },
     { name: 'Client 3', logo: '/images/logos/client3.png' },
@@ -239,7 +231,6 @@ function App() {
   }, [isMobile]);
 
   useEffect(() => {
-    // On mobile, preload logos so the "Trusted By" grid appears faster.
     if (!isMobile) return;
     clientLogos.forEach((client) => {
       const img = new Image();
@@ -267,7 +258,6 @@ function App() {
         );
       });
 
-      // Stagger animation for grids
       gsap.utils.toArray<HTMLElement>('.stagger-grid').forEach((grid) => {
         const items = grid.querySelectorAll('.stagger-item');
         gsap.fromTo(
@@ -352,7 +342,6 @@ function App() {
         </div>
       </motion.div>
 
-      {/* Header */}
       <header className="site-header">
         <motion.a 
           className="wordmark" 
@@ -393,6 +382,36 @@ function App() {
             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
           </button>
+          <motion.a
+            href="https://linktr.ee/Volraiden"
+            target="_blank"
+            rel="noreferrer"
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            title="Linktree"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              border: '1px solid var(--border)',
+              background: 'var(--panel)',
+              overflow: 'hidden',
+              cursor: 'pointer',
+            }}
+          >
+            <img
+              src="https://i.postimg.cc/p5Q8h43D/image-2026-03-27-021532300.png"
+              alt="Linktree"
+              style={{
+                width: '22px',
+                height: '22px',
+                objectFit: 'contain',
+              }}
+            />
+          </motion.a>
           <motion.a 
             className="header-cta" 
             href="https://cal.com/danielleebuckley"
@@ -415,7 +434,6 @@ function App() {
         </div>
       </header>
 
-      {/* Mobile menu */}
       <div className={`mobile-menu ${mobileMenuOpen ? 'mobile-menu-open' : ''}`} aria-hidden={!mobileMenuOpen}>
         <nav className="mobile-nav" aria-label="Mobile">
           <a href="#about" onClick={() => setMobileMenuOpen(false)}>{t('navAbout')}</a>
@@ -445,7 +463,6 @@ function App() {
       <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
 
       <main>
-        {/* Hero Section with Video */}
         <section id="hero" className="hero-section">
           <div className="hero-video-container">
             <video
@@ -505,7 +522,6 @@ function App() {
           <div className="hero-scroll">{t('scrollExplore')}</div>
         </section>
 
-        {/* About Section */}
         <section id="about" className="content-section">
           <div className="about-heading-row">
             <div className="section-heading js-reveal">
@@ -514,7 +530,6 @@ function App() {
             </div>
             <div className="about-hero-image js-reveal">
               <div className="camera-card" aria-hidden="true">
-                {/* Viewfinder Eyepiece */}
                 <div className="camera-viewfinder-eyepiece">
                   <div className="eyepiece-tube">
                     <div className="eyepiece-glass">
@@ -531,22 +546,18 @@ function App() {
                     <span className="camera-brand">DUNE CAM</span>
                   </div>
                     <div className="camera-screen">
-                    {/* Horizontally scrolling services */}
                     <div className="camera-scroll-container" ref={cameraScrollContainerRef}>
                       <div className="camera-scroll-track">
-                        {/* Set 1 */}
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service4Title')}</span><span className="scroll-desc">{t('service4Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service5Title')}</span><span className="scroll-desc">{t('service5Desc').split('.')[0]}</span></div>
-                        {/* Set 2 (duplicate for overflow) */}
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service4Title')}</span><span className="scroll-desc">{t('service4Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service5Title')}</span><span className="scroll-desc">{t('service5Desc').split('.')[0]}</span></div>
-                        {/* Set 3 (duplicate for overflow) */}
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
                         <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
@@ -591,7 +602,6 @@ function App() {
           </div>
         </section>
 
-        {/* Work Section */}
         <section id="work" className="content-section">
           <div className="section-heading js-reveal">
             <span className="section-label">{t('sectionWork')}</span>
@@ -656,10 +666,8 @@ function App() {
             </div>
 
             <div className="cinema-room-screen">
-              {/* Animated film grain overlay */}
               <div className="cinema-film-grain" aria-hidden="true" />
 
-              {/* Enhanced glow with animation */}
               <motion.div
                 className="cinema-room-glow"
                 animate={{
@@ -673,7 +681,6 @@ function App() {
                 }}
               />
 
-              {/* Animated light beams */}
               <div className="cinema-light-beams" aria-hidden="true">
                 {[...Array(3)].map((_, i) => (
                   <motion.span
@@ -713,12 +720,10 @@ function App() {
                 ))}
               </div>
 
-              {/* Projector flicker effect */}
               <div className="cinema-projector-flicker" aria-hidden="true" />
 
               <div className="cinema-room-stage">
                 <div className="cinema-room-grid">
-                  {/* Racing car driving around the cards */}
                   {serviceKeys.map((service, index) => (
                     <motion.article
                       key={service.titleKey}
@@ -798,14 +803,12 @@ function App() {
             </div>
           </motion.div>
 
-          {/* Client Logos */}
           <div className="clients-section">
             <div className="clients-header js-reveal">
               <h3>{t('trustedBy')}</h3>
               <p>{t('clientsSubtext')}</p>
             </div>
 
-            {/* Trusted By - Main Monitor Display */}
             <motion.div
               className="trusted-display-monitor js-reveal"
               initial={{ opacity: 0, y: 30 }}
@@ -813,17 +816,14 @@ function App() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              {/* Monitor Top Bar */}
               <div className="trusted-monitor-topbar">
                 <div className="trusted-monitor-dot" />
                 <span className="trusted-monitor-label">{t('trustedByBadge')}</span>
                 <span className="trusted-monitor-count">{t('brandsCount')}</span>
               </div>
 
-              {/* Main Display Screen with Logos */}
               <div className="trusted-display-screen">
                 <div className="trusted-display-overlay">
-                  {/* Viewfinder grid overlay */}
                   <div className="trusted-grid-lines">
                     <div className="grid-v left" />
                     <div className="grid-v center" />
@@ -833,7 +833,6 @@ function App() {
                     <div className="grid-h bottom" />
                   </div>
 
-                  {/* Corner brackets */}
                   <div className="trusted-corners">
                     <span className="corner-tl" />
                     <span className="corner-tr" />
@@ -841,13 +840,11 @@ function App() {
                     <span className="corner-br" />
                   </div>
 
-                  {/* Recording indicator */}
                   <div className="trusted-rec-indicator">
                     <span className="rec-dot" />
                     <span className="rec-text">REC</span>
                   </div>
 
-                  {/* Focus info */}
                   <div className="trusted-focus-info">
                     <span>F2.8</span>
                     <span>ISO 800</span>
@@ -855,7 +852,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* Clickable Logos Track */}
                 <div className="trusted-logos-display" ref={trustedLogosDisplayRef}>
                   <div className="trusted-logos-wrapper">
                     {clientLogos.map((client) => (
@@ -891,7 +887,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Monitor Controls */}
               <div className="trusted-monitor-controls">
                 <div className="trusted-control-dial">
                   <div className="dial-center" />
@@ -923,7 +918,6 @@ function App() {
                   transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Camera Body Top */}
                   <div className="camera-body-top">
                     <div className="camera-mic-holes">
                       {[...Array(6)].map((_, i) => (
@@ -933,12 +927,10 @@ function App() {
                     <div className="camera-shoulder" />
                   </div>
 
-                  {/* Camera Monitor Screen */}
                   <div className="camera-monitor-screen-wrap">
                     <div className="camera-monitor-bezel">
                       <div className="camera-monitor-brand">SONY</div>
                       <div className="camera-monitor-screen">
-                        {/* Viewfinder Overlay */}
                         <div className="camera-vf-overlay">
                           <div className="camera-vf-safety-frame" />
                           <div className="camera-vf-center-mark" />
@@ -960,7 +952,6 @@ function App() {
                           </div>
                         </div>
 
-                        {/* Logo Display */}
                         <img
                           src={selectedPartner.logo}
                           alt={selectedPartner.name}
@@ -976,13 +967,11 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Camera Info Panel */}
                   <div className="camera-info-panel">
                     <p className="camera-info-name">{selectedPartner.name}</p>
                     <p className="camera-info-meta">Trusted Partner • 4K Resolution</p>
                   </div>
 
-                  {/* Close Button */}
                   <button
                     type="button"
                     className="camera-monitor-close"
@@ -1068,7 +1057,6 @@ function App() {
           </div>
         </div>
 
-          {/* Duneworks CEO Section */}
           <motion.div 
             className="duneworks-section js-reveal"
             initial={{ opacity: 0, y: 40 }}
@@ -1101,14 +1089,12 @@ function App() {
           </motion.div>
         </section>
 
-        {/* Contact Section */}
         <section id="contact" className="content-section">
           <div className="section-heading js-reveal">
             <span className="section-label">{t('sectionContact')}</span>
             <h2>{t('getInTouchHeading')}</h2>
           </div>
 
-          {/* Social Links - Prominent */}
           <motion.div 
             className="social-links-row js-reveal"
             initial={{ opacity: 0, y: 30 }}
@@ -1179,7 +1165,6 @@ function App() {
             </motion.a>
           </motion.div>
 
-          {/* Contact Form */}
           <motion.div 
             className="contact-form-container js-reveal"
             initial={{ opacity: 0, y: 40 }}
