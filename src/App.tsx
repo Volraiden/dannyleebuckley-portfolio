@@ -200,7 +200,7 @@ function App() {
 
         if (!isDragging && shouldRun()) {
           // Very small movement so it feels like a slow "camera reel" drift.
-          el.scrollLeft += 10 * dt; // px per second
+          el.scrollLeft += 28 * dt; // px per second (visible, still slow)
 
           // Loop softly instead of snapping hard to 0.
           if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
