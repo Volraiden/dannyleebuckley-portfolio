@@ -890,10 +890,11 @@ textarea {
 }
 
 .cinema-card p {
-  margin: 0;
+  margin: 0 0 20px 0;
   color: var(--text-secondary);
   font-size: 0.92rem;
   line-height: 1.65;
+  padding-bottom: 12px;
 }
 
 .cinema-card-kicker {
@@ -2431,6 +2432,406 @@ textarea {
 :root[data-theme='light'] .evf-brand-text,
 :root[data-theme='light'] .evf-model-text {
   color: rgba(0, 0, 0, 0.5);
+}
+
+/* Trusted By Display Monitor */
+.trusted-display-monitor {
+  max-width: 900px;
+  margin: 0 auto 60px;
+  background: linear-gradient(180deg, #2a2a38, #1f1f28);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Monitor Top Bar */
+.trusted-monitor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+.trusted-monitor-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+  animation: recPulse 1.5s ease-in-out infinite;
+}
+
+.trusted-monitor-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.trusted-monitor-count {
+  font-size: 0.85rem;
+  color: rgba(59, 130, 246, 0.9);
+  font-weight: 600;
+}
+
+@keyframes recPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+  50% { opacity: 0.5; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+}
+
+/* Main Display Screen */
+.trusted-display-screen {
+  position: relative;
+  background: linear-gradient(135deg, #0a0a0f 0%, #15151a 50%, #0a0a0f 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #2a2a35;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Overlay Elements */
+.trusted-display-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Grid Lines */
+.trusted-grid-lines {
+  position: absolute;
+  inset: 0;
+}
+
+.grid-v, .grid-h {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.grid-v {
+  width: 1px;
+  height: 100%;
+  top: 0;
+}
+
+.grid-v.left { left: 33.33%; }
+.grid-v.center { left: 50%; }
+.grid-v.right { left: 66.66%; }
+
+.grid-h {
+  height: 1px;
+  width: 100%;
+  left: 0;
+}
+
+.grid-h.top { top: 33.33%; }
+.grid-h.middle { top: 50%; }
+.grid-h.bottom { top: 66.66%; }
+
+/* Corner Brackets */
+.trusted-corners {
+  position: absolute;
+  inset: 12px;
+}
+
+.corner-tl, .corner-tr, .corner-bl, .corner-br {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: rgba(255, 255, 255, 0.3);
+  border-style: solid;
+}
+
+.corner-tl {
+  top: 0;
+  left: 0;
+  border-width: 2px 0 0 2px;
+}
+
+.corner-tr {
+  top: 0;
+  right: 0;
+  border-width: 2px 2px 0 0;
+}
+
+.corner-bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 2px 2px;
+}
+
+.corner-br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 2px 2px 0;
+}
+
+/* REC Indicator */
+.trusted-rec-indicator {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: recPulse 1.5s ease-in-out infinite;
+}
+
+.rec-text {
+  font-size: 0.65rem;
+  color: rgba(239, 68, 68, 0.9);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+/* Focus Info */
+.trusted-focus-info {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 12px;
+}
+
+.trusted-focus-info span {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Bebas Neue', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* Logos Display */
+.trusted-logos-display {
+  width: 100%;
+  overflow: hidden;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.trusted-logos-wrapper {
+  display: flex;
+  gap: 24px;
+  animation: trustedLogoScroll 20s linear infinite;
+}
+
+.trusted-logo-btn {
+  flex-shrink: 0;
+  width: 100px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.trusted-logo-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.trusted-logo-btn:hover::before {
+  opacity: 1;
+}
+
+.trusted-logo-btn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.trusted-logo-display-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: brightness(1.1);
+}
+
+.trusted-logo-fallback {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  line-height: 1.2;
+}
+
+@keyframes trustedLogoScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Monitor Controls */
+.trusted-monitor-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trusted-control-dial {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3a3a48, #2a2a35);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+
+.dial-center {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #4a4a58, #3a3a48);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.trusted-control-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.trusted-control-buttons span {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trusted-brand-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Light theme - Trusted Display Monitor */
+:root[data-theme='light'] .trusted-display-monitor {
+  background: linear-gradient(180deg, #f0f0f8, #e8e8f0);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+:root[data-theme='light'] .trusted-monitor-topbar {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-monitor-label {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:root[data-theme='light'] .trusted-display-screen {
+  background: linear-gradient(135deg, #f8f8fc 0%, #f0f0f5 50%, #f8f8fc 100%);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .grid-v,
+:root[data-theme='light'] .grid-h {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme='light'] .corner-tl,
+:root[data-theme='light'] .corner-tr,
+:root[data-theme='light'] .corner-bl,
+:root[data-theme='light'] .corner-br {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme='light'] .trusted-focus-info span {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme='light'] .trusted-logo-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-logo-btn:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-logo-fallback {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme='light'] .trusted-monitor-controls {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-control-dial {
+  background: linear-gradient(145deg, #e8e8f0, #d8d8e0);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+:root[data-theme='light'] .dial-center {
+  background: linear-gradient(145deg, #f0f0f5, #e0e0e8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-control-buttons span {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.5);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .trusted-brand-badge {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .trusted-display-monitor {
+    padding: 12px;
+    margin-bottom: 40px;
+  }
+
+  .trusted-logo-btn {
+    width: 80px;
+    height: 64px;
+    padding: 8px;
+  }
+
+  .trusted-logos-display {
+    padding: 30px 15px;
+  }
+
+  .trusted-logos-wrapper {
+    gap: 16px;
+  }
 }
 
 /* Client Logos Section - Enhanced & Bigger */

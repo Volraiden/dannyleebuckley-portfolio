@@ -854,243 +854,107 @@ function App() {
               <p>{t('clientsSubtext')}</p>
             </div>
 
-            {/* Camera Monitor with Viewfinder */}
+            {/* Trusted By - Main Monitor Display */}
             <motion.div
-              className="camera-monitor-trusted js-reveal"
+              className="trusted-display-monitor js-reveal"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              {/* Camera Body Shoulder */}
-              <div className="cam-shoulder">
-                <div className="cam-shoulder-pad" />
-                <div className="cam-recording-indicator">
-                  <span className="cam-rec-dot" />
-                  <span className="cam-rec-text">REC</span>
-                </div>
-                <div className="cam-battery-indicator">
-                  <span className="cam-bat-icon">🔋</span>
-                  <span className="cam-bat-level">87%</span>
-                </div>
+              {/* Monitor Top Bar */}
+              <div className="trusted-monitor-topbar">
+                <div className="trusted-monitor-dot" />
+                <span className="trusted-monitor-label">{t('trustedByBadge')}</span>
+                <span className="trusted-monitor-count">{t('brandsCount')}</span>
               </div>
 
-              {/* Professional Viewfinder with Trusted By Logos */}
-              <div className="cam-viewfinder-section">
-                <div className="cam-evf-assembly">
-                  {/* Rubber eyecup like Sony A7 III */}
-                  <div className="cam-evf-eyecup">
-                    <div className="eyecup-rubber">
-                      <div className="eyecup-inner-ring" />
-                    </div>
+              {/* Main Display Screen with Logos */}
+              <div className="trusted-display-screen">
+                <div className="trusted-display-overlay">
+                  {/* Viewfinder grid overlay */}
+                  <div className="trusted-grid-lines">
+                    <div className="grid-v left" />
+                    <div className="grid-v center" />
+                    <div className="grid-v right" />
+                    <div className="grid-h top" />
+                    <div className="grid-h middle" />
+                    <div className="grid-h bottom" />
                   </div>
-                  {/* Viewfinder housing */}
-                  <div className="cam-evf-housing">
-                    <div className="cam-evf-housing-top">
-                      <span className="evf-sensor-label">XGA OLED</span>
-                    </div>
-                    <div className="cam-evf-display">
-                      {/* Viewfinder screen showing logos */}
-                      <div className="evf-screen">
-                        <div className="evf-grid-overlay" />
-                        <div className="evf-logos-container">
-                          <div className="evf-logos-track">
-                            {/* First set of logos */}
-                            {clientLogos.slice(0, 5).map((client, idx) => (
-                              <div key={`a-${idx}`} className="evf-logo-item">
-                                <img
-                                  src={client.logo}
-                                  alt={client.name}
-                                  className="evf-logo-img"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.parentElement?.classList.add('fallback');
-                                  }}
-                                />
-                              </div>
-                            ))}
-                            {/* Duplicated for smooth infinite scroll */}
-                            {clientLogos.slice(0, 5).map((client, idx) => (
-                              <div key={`b-${idx}`} className="evf-logo-item">
-                                <img
-                                  src={client.logo}
-                                  alt={client.name}
-                                  className="evf-logo-img"
-                                  onError={(e) => {
-                                    e.currentTarget.style.display = 'none';
-                                    e.currentTarget.parentElement?.classList.add('fallback');
-                                  }}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="evf-badge">{t('trustedByBadge')}</div>
-                      </div>
-                    </div>
-                    <div className="cam-evf-branding">
-                      <span className="evf-brand-text">SONY</span>
-                      <span className="evf-model-text">FX6</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Main Monitor Screen */}
-              <div className="cam-monitor-bezel">
-                <div className="cam-monitor-brand-row">
-                  <span className="cam-brand">SONY</span>
-                  <span className="cam-model">FX6</span>
-                  <div className="cam-status-icons">
-                    <span className="cam-icon">⚡</span>
-                    <span className="cam-icon">📹</span>
-                    <span className="cam-icon">🎤</span>
+                  {/* Corner brackets */}
+                  <div className="trusted-corners">
+                    <span className="corner-tl" />
+                    <span className="corner-tr" />
+                    <span className="corner-bl" />
+                    <span className="corner-br" />
+                  </div>
+
+                  {/* Recording indicator */}
+                  <div className="trusted-rec-indicator">
+                    <span className="rec-dot" />
+                    <span className="rec-text">REC</span>
+                  </div>
+
+                  {/* Focus info */}
+                  <div className="trusted-focus-info">
+                    <span>F2.8</span>
+                    <span>ISO 800</span>
+                    <span>1/120</span>
                   </div>
                 </div>
 
-                <div className="cam-screen-container">
-                  {/* Screen with viewfinder overlay */}
-                  <div className="cam-screen">
-                    {/* Professional viewfinder overlay */}
-                    <div className="cam-vf-overlay">
-                      {/* Safety zone frame */}
-                      <div className="cam-safety-frame">
-                        <span className="corner-tl">┏</span>
-                        <span className="corner-tr">┓</span>
-                        <span className="corner-bl">┗</span>
-                        <span className="corner-br">┛</span>
-                      </div>
-
-                      {/* Center crosshair */}
-                      <div className="cam-crosshair">
-                        <div className="crosshair-h" />
-                        <div className="crosshair-v" />
-                        <div className="crosshair-center" />
-                      </div>
-
-                      {/* Rule of thirds grid */}
-                      <div className="cam-thirds-grid">
-                        <div className="third-line v left" />
-                        <div className="third-line v right" />
-                        <div className="third-line h top" />
-                        <div className="third-line h bottom" />
-                      </div>
-
-                      {/* HUD Info */}
-                      <div className="cam-hud">
-                        <div className="cam-hud-top">
-                          <span className="hud-item timecode">00:45:23:18</span>
-                          <span className="hud-item format">4K 60p</span>
-                          <span className="hud-item codec">XAVC-I</span>
-                        </div>
-                        <div className="cam-hud-bottom">
-                          <span className="hud-item iris">F2.8</span>
-                          <span className="hud-item iso">ISO 800</span>
-                          <span className="hud-item shutter">1/120</span>
-                          <span className="hud-item wb">5600K</span>
-                          <span className="hud-item lut">S-LOG3</span>
-                        </div>
-                      </div>
-
-                      {/* Focus peaking simulation */}
-                      <div className="cam-focus-peaking">
-                        <svg viewBox="0 0 400 240" className="peaking-svg">
-                          <path d="M50 80 Q100 60 150 80 T250 80" stroke="#ff0000" strokeWidth="2" fill="none" strokeDasharray="4,4" opacity="0.6" />
-                          <path d="M120 150 Q180 130 240 150" stroke="#ff0000" strokeWidth="2" fill="none" strokeDasharray="4,4" opacity="0.6" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Content inside monitor - Trusted By Title */}
-                    <div className="cam-screen-content">
-                      <motion.div
-                        className="cam-trusted-title"
-                        animate={{ opacity: [0.8, 1, 0.8] }}
-                        transition={{ duration: 2, repeat: Infinity }}
+                {/* Clickable Logos Track */}
+                <div className="trusted-logos-display">
+                  <div className="trusted-logos-wrapper">
+                    {[...clientLogos, ...clientLogos].map((client, index) => (
+                      <motion.button
+                        key={`${client.name}-${index}`}
+                        type="button"
+                        className="trusted-logo-btn"
+                        onClick={() => setSelectedPartner(client)}
+                        whileHover={{ scale: 1.1, zIndex: 10 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                       >
-                        <span className="trusted-badge">{t('trustedByBadge')}</span>
-                        <span className="trusted-count">{t('brandsCount')}</span>
-                      </motion.div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Monitor controls */}
-                <div className="cam-controls-row">
-                  <div className="cam-dial">
-                    <div className="dial-markings" />
-                  </div>
-                  <div className="cam-buttons">
-                    <span className="cam-btn-monitor">MENU</span>
-                    <span className="cam-btn-monitor">DISPLAY</span>
-                    <span className="cam-btn-monitor">ZEBRA</span>
-                    <span className="cam-btn-monitor">PEAK</span>
-                  </div>
-                  <div className="cam-joystick">
-                    <div className="joystick-base">
-                      <div className="joystick-stick" />
-                    </div>
+                        {brokenLogos[client.name] ? (
+                          <span className="trusted-logo-fallback">{client.name}</span>
+                        ) : (
+                          <img
+                            src={client.logo}
+                            alt={client.name}
+                            className="trusted-logo-display-img"
+                            loading={isMobile ? 'eager' : 'lazy'}
+                            decoding="async"
+                            onError={() =>
+                              setBrokenLogos((prev) => ({
+                                ...prev,
+                                [client.name]: true,
+                              }))
+                            }
+                          />
+                        )}
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              {/* Camera lens mount preview */}
-              <div className="cam-lens-section-mini">
-                <div className="cam-lens-mount-ring">
-                  <span className="mount-dot-mini" />
-                  <span className="mount-label">E-MOUNT</span>
-                  <span className="mount-dot-mini" />
+              {/* Monitor Controls */}
+              <div className="trusted-monitor-controls">
+                <div className="trusted-control-dial">
+                  <div className="dial-center" />
                 </div>
-                <div className="cam-lens-barrel-mini">
-                  <div className="lens-grip-rings">
-                    <div className="grip-ring focus" />
-                    <div className="grip-ring zoom" />
-                  </div>
-                  <div className="lens-glass-mini">
-                    <div className="aperture-blades-mini" />
-                    <div className="lens-reflection-mini" />
-                  </div>
+                <div className="trusted-control-buttons">
+                  <span>MENU</span>
+                  <span>DISP</span>
+                  <span>PEAK</span>
+                </div>
+                <div className="trusted-brand-badge">
+                  <span>SONY</span>
                 </div>
               </div>
             </motion.div>
-
-            <div className="camera-trusted-strip">
-              <div className="camera-trusted-top">
-                <span className="camera-trusted-dot" />
-                <span className="camera-trusted-label">{t('viewfinderLabel')}</span>
-              </div>
-              <div className="camera-trusted-track">
-                <div className="camera-trusted-row">
-                  {[...clientLogos, ...clientLogos].map((client, index) => (
-                    <button
-                      key={`${client.name}-${index}`}
-                      type="button"
-                      className="camera-trusted-logo"
-                      onClick={() => setSelectedPartner(client)}
-                    >
-                      {brokenLogos[client.name] ? (
-                        <span className="client-logo-fallback">{client.name}</span>
-                      ) : (
-                        <img
-                          src={client.logo}
-                          alt={client.name}
-                          className="client-logo-img"
-                          loading={isMobile ? 'eager' : 'lazy'}
-                          fetchPriority={isMobile && index < 8 ? 'high' : 'auto'}
-                          decoding="async"
-                          onError={() =>
-                            setBrokenLogos((prev) => ({
-                              ...prev,
-                              [client.name]: true,
-                            }))
-                          }
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
 
             {selectedPartner && (
               <motion.div
