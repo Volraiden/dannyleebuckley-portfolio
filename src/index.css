@@ -1390,8 +1390,13 @@ textarea {
 .camera-scroll-track {
   display: flex;
   gap: 40px;
-  animation: none;
   width: max-content;
+  animation: cameraAutoScroll 24s linear infinite;
+}
+
+.camera-scroll-container:hover .camera-scroll-track,
+.camera-scroll-container:active .camera-scroll-track {
+  animation-play-state: paused;
 }
 
 .camera-scroll-item {
@@ -1443,6 +1448,12 @@ textarea {
 @keyframes cameraScrollHorizontal {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+/* Smooth auto-scroll for camera strip - 3 sets of 5 items */
+@keyframes cameraAutoScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-66.666%); }
 }
 
 /* Camera scroll light theme */
@@ -2825,11 +2836,12 @@ textarea {
 .trusted-logos-wrapper {
   display: flex;
   gap: 24px;
-  animation: none;
+  animation: trustedAutoScroll 22s linear infinite;
 }
 
-.trusted-logos-display:hover .trusted-logos-wrapper {
-  animation-play-state: running;
+.trusted-logos-display:hover .trusted-logos-wrapper,
+.trusted-logos-display:active .trusted-logos-wrapper {
+  animation-play-state: paused;
 }
 
 .trusted-logos-display {
@@ -2903,6 +2915,12 @@ textarea {
 }
 
 @keyframes trustedLogoScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Smooth auto-scroll for trusted logos - single set loops */
+@keyframes trustedAutoScroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }

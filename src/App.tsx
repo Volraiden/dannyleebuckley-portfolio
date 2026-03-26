@@ -173,55 +173,7 @@ function App() {
     };
   }, [chatMessages]);
 
-  // Auto-scroll (slow drift) for the horizontal strips.
-  // Pauses briefly after any user scroll/drag so it doesn't fight the user.
-  useEffect(() => {
-    const setup = (el: HTMLDivElement | null) => {
-      if (!el) return;
-
-      let lastUserScrollTs = 0;
-
-      const markUser = () => {
-        lastUserScrollTs = Date.now();
-      };
-
-      // If the user grabs the scrollbar thumb, `scroll` will fire; we pause after that.
-      const onScroll = () => markUser();
-      el.addEventListener('scroll', onScroll, { passive: true });
-      el.addEventListener('pointerdown', markUser);
-
-      const speedPxPerSec = 160; // noticeable but still slow
-      const intervalMs = 30;
-      const delta = (speedPxPerSec * intervalMs) / 1000;
-
-      const intervalId = window.setInterval(() => {
-        // Pause for a moment after user interaction.
-        if (Date.now() - lastUserScrollTs < 700) return;
-
-        const maxScroll = el.scrollWidth - el.clientWidth;
-        if (maxScroll <= 0) return;
-
-        el.scrollLeft += delta;
-        if (el.scrollLeft >= maxScroll - 1) {
-          el.scrollLeft = 0;
-        }
-      }, intervalMs);
-
-      return () => {
-        window.clearInterval(intervalId);
-        el.removeEventListener('scroll', onScroll);
-        el.removeEventListener('pointerdown', markUser);
-      };
-    };
-
-    const cleanupCamera = setup(cameraScrollContainerRef.current);
-    const cleanupTrusted = setup(trustedLogosDisplayRef.current);
-
-    return () => {
-      cleanupCamera?.();
-      cleanupTrusted?.();
-    };
-  }, []);
+  // Note: Auto-scroll is now handled by CSS animations (smoother than JS).
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -578,31 +530,28 @@ function App() {
                     <span className="camera-indicator" />
                     <span className="camera-brand">DUNE CAM</span>
                   </div>
-                  <div className="camera-screen">
+                    <div className="camera-screen">
                     {/* Horizontally scrolling services */}
                     <div className="camera-scroll-container" ref={cameraScrollContainerRef}>
                       <div className="camera-scroll-track">
-                        {/* First set */}
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service1Title')}</span>
-                          <span className="scroll-desc">{t('service1Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service2Title')}</span>
-                          <span className="scroll-desc">{t('service2Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service3Title')}</span>
-                          <span className="scroll-desc">{t('service3Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service4Title')}</span>
-                          <span className="scroll-desc">{t('service4Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service5Title')}</span>
-                          <span className="scroll-desc">{t('service5Desc').split('.')[0]}</span>
-                        </div>
+                        {/* Set 1 */}
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service4Title')}</span><span className="scroll-desc">{t('service4Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service5Title')}</span><span className="scroll-desc">{t('service5Desc').split('.')[0]}</span></div>
+                        {/* Set 2 (duplicate for overflow) */}
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service4Title')}</span><span className="scroll-desc">{t('service4Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service5Title')}</span><span className="scroll-desc">{t('service5Desc').split('.')[0]}</span></div>
+                        {/* Set 3 (duplicate for overflow) */}
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service1Title')}</span><span className="scroll-desc">{t('service1Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service2Title')}</span><span className="scroll-desc">{t('service2Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service3Title')}</span><span className="scroll-desc">{t('service3Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service4Title')}</span><span className="scroll-desc">{t('service4Desc').split('.')[0]}</span></div>
+                        <div className="camera-scroll-item"><span className="scroll-title">{t('service5Title')}</span><span className="scroll-desc">{t('service5Desc').split('.')[0]}</span></div>
                       </div>
                     </div>
                     <div className="camera-screen-lines" />
