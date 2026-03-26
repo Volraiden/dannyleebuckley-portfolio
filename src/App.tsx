@@ -53,8 +53,16 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Only include logo files that actually exist in /public/images/logos.
+  // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
+    { name: 'Client 2', logo: '/images/logos/client2.png' },
+    { name: 'Client 3', logo: '/images/logos/client3.png' },
+    { name: 'Client 4', logo: '/images/logos/client4.png' },
+    { name: 'Client 5', logo: '/images/logos/client5.png' },
+    { name: 'Client 6', logo: '/images/logos/client6.png' },
+    { name: 'Client 7', logo: '/images/logos/client7.png' },
+    { name: 'ZBS', logo: '/images/logos/zbs.png' },
+    { name: 'Iguana Studios', logo: '/images/logos/iguana-studios.png' },
     { name: '24H Series', logo: '/images/logos/24h-series.png' },
     { name: 'FIA', logo: '/images/logos/fia.png' },
     { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
@@ -63,6 +71,7 @@ function App() {
     { name: 'Duneworks Media', logo: '/images/logos/duneworks-media.png' },
     { name: 'D Logo', logo: '/images/logos/d-logo.png' },
   ];
+  const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 768px)');
@@ -438,11 +447,23 @@ function App() {
                   viewport={{ once: true }}
                   whileHover={{ y: -4, scale: 1.05 }}
                 >
-                  <img 
-                    src={client.logo} 
-                    alt={client.name}
-                    className="client-logo-img"
-                  />
+                  {brokenLogos[client.name] ? (
+                    <span className="client-logo-fallback">{client.name}</span>
+                  ) : (
+                    <img
+                      src={client.logo}
+                      alt={client.name}
+                      className="client-logo-img"
+                      loading="lazy"
+                      decoding="async"
+                      onError={() =>
+                        setBrokenLogos((prev) => ({
+                          ...prev,
+                          [client.name]: true,
+                        }))
+                      }
+                    />
+                  )}
                 </motion.div>
               ))}
             </div>

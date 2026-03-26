@@ -870,6 +870,20 @@ textarea {
   transition: all 0.3s ease;
 }
 
+.client-logo-fallback {
+  display: inline-block;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-align: center;
+  white-space: normal;
+}
+
 .client-logo:hover .client-logo-img {
   transform: scale(1.08);
 }
