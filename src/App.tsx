@@ -479,11 +479,13 @@ function App() {
                 <Clapperboard size={16} />
                 <Film size={16} />
               </div>
-              <motion.div
-                className="work-cinematic-track"
-                animate={{ backgroundPositionX: ['0%', '100%'] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-              />
+              <div className="work-cinematic-track-wrap">
+                <motion.div
+                  className="work-cinematic-track"
+                  animate={{ backgroundPositionX: ['0%', '100%'] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                />
+              </div>
             </div>
           </div>
 
@@ -496,7 +498,14 @@ function App() {
 
             <div className="cinema-room-screen">
               <div className="cinema-room-glow" />
+              <div className="cinema-ambient-lights" aria-hidden="true">
+                {[...Array(8)].map((_, lightIndex) => (
+                  <span key={lightIndex} className="cinema-light" />
+                ))}
+              </div>
               <div className="cinema-room-stage">
+                <div className="cinema-letterbox top" />
+                <div className="cinema-letterbox bottom" />
                 <div className="cinema-room-grid">
                   {serviceKeys.map((service) => (
                     <motion.article
