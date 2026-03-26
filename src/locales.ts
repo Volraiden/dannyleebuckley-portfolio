@@ -163,9 +163,9 @@ export const translations: Record<Locale, Record<string, string>> = {
     heroSubtitle: 'Professional fotograf, rejissor va dasturchi. Brendlar, tadbirlar va yaratuvchilar uchun vizual kontent, saytlar va raqamli tizimlar yarataman.',
     aboutHeading: 'Brendlar, tadbirlar va butun dunyo yaratuvchilari uchun premium vizual kontent yarataman.',
     aboutPara1:
-      \"O'zbekistonda yashayman, avstraliyalikman. Reklama, tadbirlar va raqamli kontent uchun vizual ishlar qilaman. Shuningdek, kreativchilar va brendlar uchun saytlar, dasturiy ta'minot va tizimlar yarataman.\",
+      "O'zbekistonda yashayman, avstraliyalikman. Reklama, tadbirlar va raqamli kontent uchun vizual ishlar qilaman. Shuningdek, kreativchilar va brendlar uchun saytlar, dasturiy ta'minot va tizimlar yarataman.",
     aboutPara2:
-      \"Tez tadbir muhitlaridan yirik reklama setlari va brend kampaniyalarigacha — (jumladan yirik bank va kompaniyalar uchun media sifatida) loyihalarni kinematografik, aniq va professional qilishga intilaman.\",
+      "Tez tadbir muhitlaridan yirik reklama setlari va brend kampaniyalarigacha — (jumladan yirik bank va kompaniyalar uchun media sifatida) loyihalarni kinematografik, aniq va professional qilishga intilaman.",
     workHeading: 'Foto, film va raqamli yetkazib berish bo\'yicha premium vizual kontent yarataman.',
     service1Title: 'Fotografiya',
     service1Desc: 'Tadbir yoritish, portretlar, brend kampaniyalari va hujjatli hikoyalar — barcha janrlar.',
@@ -295,7 +295,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     heroSubtitle: 'Profesyonel fotoğrafçı, yönetmen ve geliştirici. Dünya çapında görsel içerik, web siteleri ve dijital sistemler üretiyorum.',
     aboutHeading: 'Markalar, etkinlikler ve yaratıcılar için premium görsel içerik üretiyorum.',
     aboutPara1:
-      \"Özbekistan'da yaşıyorum, Avustralya kökenliyim. Ticari prodüksiyon, etkinlikler ve dijital içerikte görsel işler yapıyorum. Ayrıca yaratıcılar ve markalar için web siteleri, yazılım ve sistemler geliştiriyorum.\",
+      "Özbekistan'da yaşıyorum, Avustralya kökenliyim. Ticari prodüksiyon, etkinlikler ve dijital içerikte görsel işler yapıyorum. Ayrıca yaratıcılar ve markalar için web siteleri, yazılım ve sistemler geliştiriyorum.",
     aboutPara2:
       'Hızlı etkinlik ortamlarından büyük reklam setlerine ve marka kampanyalarına kadar — (büyük bankalar ve markalar için medya olarak) projeleri sinematik, net ve profesyonel hissettiriyorum.',
     workHeading: 'Fotoğraf, film ve dijital teslimat alanında premium görsel içerik üretiyorum.',
