@@ -832,7 +832,7 @@ textarea {
 }
 
 .cinema-card {
-  padding: 18px;
+  padding: 24px 22px 28px 22px;
   border-radius: 16px;
   border: 1px solid var(--border);
   background: var(--bg-card);
@@ -890,11 +890,11 @@ textarea {
 }
 
 .cinema-card p {
-  margin: 0 0 20px 0;
+  margin: 12px 0 8px 0;
   color: var(--text-secondary);
   font-size: 0.92rem;
-  line-height: 1.65;
-  padding-bottom: 12px;
+  line-height: 1.7;
+  padding: 0 4px 16px 4px;
 }
 
 .cinema-card-kicker {
@@ -2633,14 +2633,14 @@ textarea {
 
 .trusted-logo-btn {
   flex-shrink: 0;
-  width: 100px;
-  height: 80px;
+  width: 140px;
+  height: 100px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  border-radius: 12px;
   display: grid;
   place-items: center;
-  padding: 12px;
+  padding: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -2666,8 +2666,8 @@ textarea {
 }
 
 .trusted-logo-display-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   filter: brightness(1.1);
 }
@@ -2820,9 +2820,9 @@ textarea {
   }
 
   .trusted-logo-btn {
-    width: 80px;
-    height: 64px;
-    padding: 8px;
+    width: 110px;
+    height: 80px;
+    padding: 12px;
   }
 
   .trusted-logos-display {

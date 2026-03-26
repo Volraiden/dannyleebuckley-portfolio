@@ -1025,38 +1025,6 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Camera Lens */}
-                  <div className="camera-lens-section">
-                    <div className="camera-lens-mount">
-                      <div className="lens-mount-ring">
-                        <span className="mount-dot" />
-                        <span className="mount-text">E-MOUNT</span>
-                        <span className="mount-dot" />
-                      </div>
-                    </div>
-                    <div className="camera-lens-body">
-                      <div className="lens-focus-ring">
-                        <div className="focus-grip" />
-                      </div>
-                      <div className="lens-zoom-ring">
-                        <div className="zoom-grip" />
-                      </div>
-                      <div className="lens-glass">
-                        <div className="lens-reflection" />
-                        <div className="lens-aperture">
-                          <div className="aperture-blades" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="lens-hood">
-                      <div className="hood-ribs">
-                        {[...Array(4)].map((_, i) => (
-                          <span key={i} className="hood-rib" />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Camera Info Panel */}
                   <div className="camera-info-panel">
                     <p className="camera-info-name">{selectedPartner.name}</p>
