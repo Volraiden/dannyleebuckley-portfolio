@@ -92,7 +92,6 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [cameraDetailIndex, setCameraDetailIndex] = useState(0);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [selectedPartner, setSelectedPartner] = useState<{ name: string; logo: string } | null>(null);
   const [chatMessages, setChatMessages] = useState<{ type: 'user' | 'bot'; text: string }[]>([]);
@@ -209,14 +208,6 @@ function App() {
     if (!isMobile || !heroVideoRef.current) return;
     heroVideoRef.current.play().catch(() => {});
   }, [isMobile]);
-
-  // Camera detail rotation - cycles through 5 services every 2 seconds
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setCameraDetailIndex((prev) => (prev + 1) % 5);
-    }, 2000);
-    return () => window.clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     // On mobile, preload logos so the "Trusted By" grid appears faster.
@@ -511,32 +502,53 @@ function App() {
                     <span className="camera-brand">DUNE CAM</span>
                   </div>
                   <div className="camera-screen">
-                    <motion.div
-                      key={`title-${cameraDetailIndex}-${locale}`}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35 }}
-                      className="camera-screen-text"
-                    >
-                      {cameraDetailIndex === 0 && t('service1Title')}
-                      {cameraDetailIndex === 1 && t('service2Title')}
-                      {cameraDetailIndex === 2 && t('service3Title')}
-                      {cameraDetailIndex === 3 && t('service4Title')}
-                      {cameraDetailIndex === 4 && t('service5Title')}
-                    </motion.div>
-                    <motion.div
-                      key={`detail-${cameraDetailIndex}-${locale}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.3 }}
-                      className="camera-screen-subtext"
-                    >
-                      {cameraDetailIndex === 0 && t('service1Desc').split('.')[0]}
-                      {cameraDetailIndex === 1 && t('service2Desc').split('.')[0]}
-                      {cameraDetailIndex === 2 && t('service3Desc').split('.')[0]}
-                      {cameraDetailIndex === 3 && t('service4Desc').split('.')[0]}
-                      {cameraDetailIndex === 4 && t('service5Desc').split('.')[0]}
-                    </motion.div>
+                    {/* Horizontally scrolling services */}
+                    <div className="camera-scroll-container">
+                      <div className="camera-scroll-track">
+                        {/* First set */}
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service1Title')}</span>
+                          <span className="scroll-desc">{t('service1Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service2Title')}</span>
+                          <span className="scroll-desc">{t('service2Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service3Title')}</span>
+                          <span className="scroll-desc">{t('service3Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service4Title')}</span>
+                          <span className="scroll-desc">{t('service4Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service5Title')}</span>
+                          <span className="scroll-desc">{t('service5Desc').split('.')[0]}</span>
+                        </div>
+                        {/* Duplicated for infinite scroll */}
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service1Title')}</span>
+                          <span className="scroll-desc">{t('service1Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service2Title')}</span>
+                          <span className="scroll-desc">{t('service2Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service3Title')}</span>
+                          <span className="scroll-desc">{t('service3Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service4Title')}</span>
+                          <span className="scroll-desc">{t('service4Desc').split('.')[0]}</span>
+                        </div>
+                        <div className="camera-scroll-item">
+                          <span className="scroll-title">{t('service5Title')}</span>
+                          <span className="scroll-desc">{t('service5Desc').split('.')[0]}</span>
+                        </div>
+                      </div>
+                    </div>
                     <div className="camera-screen-lines" />
                   </div>
                   <div className="camera-controls">

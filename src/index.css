@@ -828,7 +828,7 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  padding: 28px 18px 20px;
+  padding: 35px 28px 28px;
 }
 
 /* Racing car that drives around the cinema cards */
@@ -888,14 +888,22 @@ textarea {
 }
 
 .cinema-card {
-  padding: 16px 18px 18px 18px;
-  border-radius: 14px;
+  padding: 14px 16px 14px 16px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  min-height: 140px;
+  min-height: 130px;
+}
+
+.cinema-card p {
+  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  padding: 0 4px;
 }
 
 /* Movie grain effect on cinema cards */
@@ -1334,8 +1342,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 12px;
   min-height: 190px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
   position: relative;
   overflow: hidden;
   background:
@@ -1343,20 +1351,60 @@ textarea {
     linear-gradient(180deg, rgba(10, 10, 12, 1), rgba(6, 6, 8, 1));
 }
 
-.camera-screen-text {
-  z-index: 2;
+/* Horizontal scrolling camera content */
+.camera-scroll-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 20px 0;
+}
+
+.camera-scroll-track {
+  display: flex;
+  gap: 40px;
+  animation: cameraScrollHorizontal 25s linear infinite;
+  width: max-content;
+}
+
+.camera-scroll-item {
+  flex-shrink: 0;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  padding: 0 10px;
+}
+
+.scroll-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+  font-size: 1.4rem;
   letter-spacing: 0.05em;
   color: #f4f4f5;
   text-transform: uppercase;
-  position: absolute;
-  top: 30%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
-  padding: 0 16px;
+  white-space: nowrap;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-desc {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+@keyframes cameraScrollHorizontal {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Camera scroll light theme */
+:root[data-theme='light'] .camera-scroll-item .scroll-title {
+  color: #1a1a24;
+  text-shadow: none;
+}
+
+:root[data-theme='light'] .camera-scroll-item .scroll-desc {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 .camera-screen-lines {
@@ -1443,21 +1491,6 @@ textarea {
   border-top: none;
 }
 
-/* Camera Screen Subtext */
-.camera-screen-subtext {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-align: center;
-  max-width: 90%;
-  z-index: 2;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.35;
-}
-
 @keyframes cameraBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -1479,15 +1512,6 @@ textarea {
     radial-gradient(circle at 50% 50%, rgba(80, 110, 255, 0.1), transparent 70%),
     linear-gradient(180deg, rgba(245, 245, 250, 1), rgba(235, 235, 242, 1));
   border-color: rgba(0, 0, 0, 0.1);
-}
-
-:root[data-theme='light'] .camera-screen-text {
-  color: #1a1a24;
-  text-shadow: none;
-}
-
-:root[data-theme='light'] .camera-screen-subtext {
-  color: rgba(0, 0, 0, 0.6);
 }
 
 :root[data-theme='light'] .eyepiece-tube {
@@ -2699,12 +2723,21 @@ textarea {
   padding: 40px 20px;
   position: relative;
   z-index: 1;
+  cursor: grab;
+}
+
+.trusted-logos-display:active {
+  cursor: grabbing;
 }
 
 .trusted-logos-wrapper {
   display: flex;
   gap: 24px;
-  animation: trustedLogoScroll 20s linear infinite;
+  animation: trustedLogoScroll 30s linear infinite;
+}
+
+.trusted-logos-display:hover .trusted-logos-wrapper {
+  animation-play-state: paused;
 }
 
 .trusted-logo-btn {
