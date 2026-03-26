@@ -88,6 +88,8 @@ function App() {
   const appRef = useRef<HTMLDivElement>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const aiPreviewMessagesRef = useRef<HTMLDivElement>(null);
+  const cameraScrollContainerRef = useRef<HTMLDivElement>(null);
+  const trustedLogosDisplayRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -170,6 +172,63 @@ function App() {
       window.clearInterval(intervalId);
     };
   }, [chatMessages]);
+
+  // Slow auto-scroll for the horizontal strips.
+  // Pauses while the user is actively dragging the scrollbar/thumb.
+  useEffect(() => {
+    const setup = (el: HTMLDivElement | null, shouldRun: () => boolean) => {
+      if (!el) return;
+
+      let isDragging = false;
+      let rafId = 0;
+      let lastTs = performance.now();
+
+      const onPointerDown = () => {
+        isDragging = true;
+      };
+      const onPointerUp = () => {
+        isDragging = false;
+      };
+
+      el.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+
+      const tick = (ts: number) => {
+        const dt = Math.min(0.05, (ts - lastTs) / 1000); // clamp to avoid jumps
+        lastTs = ts;
+
+        if (!isDragging && shouldRun()) {
+          // Very small movement so it feels like a slow "camera reel" drift.
+          el.scrollLeft += 10 * dt; // px per second
+
+          // Loop softly instead of snapping hard to 0.
+          if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
+            el.scrollLeft = 0;
+          }
+        }
+
+        rafId = window.requestAnimationFrame(tick);
+      };
+
+      rafId = window.requestAnimationFrame(tick);
+
+      return () => {
+        window.cancelAnimationFrame(rafId);
+        el.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+      };
+    };
+
+    const cleanupCamera = setup(cameraScrollContainerRef.current, () => true);
+    const cleanupTrusted = setup(trustedLogosDisplayRef.current, () => !selectedPartner);
+
+    return () => {
+      cleanupCamera?.();
+      cleanupTrusted?.();
+    };
+  }, [selectedPartner]);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -528,7 +587,7 @@ function App() {
                   </div>
                   <div className="camera-screen">
                     {/* Horizontally scrolling services */}
-                    <div className="camera-scroll-container">
+                    <div className="camera-scroll-container" ref={cameraScrollContainerRef}>
                       <div className="camera-scroll-track">
                         {/* First set */}
                         <div className="camera-scroll-item">
@@ -963,7 +1022,7 @@ function App() {
                 </div>
 
                 {/* Clickable Logos Track */}
-                <div className="trusted-logos-display">
+                <div className="trusted-logos-display" ref={trustedLogosDisplayRef}>
                   <div className="trusted-logos-wrapper">
                     {clientLogos.map((client) => (
                       <motion.button

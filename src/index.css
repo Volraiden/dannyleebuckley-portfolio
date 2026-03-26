@@ -1380,9 +1380,10 @@ textarea {
   overflow-x: auto;
   overflow-y: hidden;
   padding: 18px 6px;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 245, 255, 0.35) rgba(0, 0, 0, 0);
   cursor: grab;
 }
 
@@ -1404,8 +1405,18 @@ textarea {
   scroll-snap-align: center;
 }
 
+/* Scrollbar (visible) - gives a clear drag handle on desktop */
 .camera-scroll-container::-webkit-scrollbar {
-  display: none;
+  height: 10px;
+}
+
+.camera-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.camera-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(245, 245, 255, 0.25);
+  border-radius: 999px;
 }
 
 .camera-scroll-container:active {
@@ -2820,8 +2831,22 @@ textarea {
   animation-play-state: running;
 }
 
+.trusted-logos-display {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 245, 255, 0.35) rgba(0, 0, 0, 0);
+}
+
 .trusted-logos-display::-webkit-scrollbar {
-  display: none;
+  height: 12px;
+}
+
+.trusted-logos-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.trusted-logos-display::-webkit-scrollbar-thumb {
+  background: rgba(245, 245, 255, 0.25);
+  border-radius: 999px;
 }
 
 .trusted-logo-btn {
