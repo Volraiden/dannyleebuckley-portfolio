@@ -551,27 +551,6 @@ function App() {
                           <span className="scroll-title">{t('service5Title')}</span>
                           <span className="scroll-desc">{t('service5Desc').split('.')[0]}</span>
                         </div>
-                        {/* Duplicated for infinite scroll */}
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service1Title')}</span>
-                          <span className="scroll-desc">{t('service1Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service2Title')}</span>
-                          <span className="scroll-desc">{t('service2Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service3Title')}</span>
-                          <span className="scroll-desc">{t('service3Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service4Title')}</span>
-                          <span className="scroll-desc">{t('service4Desc').split('.')[0]}</span>
-                        </div>
-                        <div className="camera-scroll-item">
-                          <span className="scroll-title">{t('service5Title')}</span>
-                          <span className="scroll-desc">{t('service5Desc').split('.')[0]}</span>
-                        </div>
                       </div>
                     </div>
                     <div className="camera-screen-lines" />
@@ -767,6 +746,47 @@ function App() {
                     ))}
                   </div>
                   <div className="racing-text">LAP 47/56</div>
+                  {/* Static car marker for the LAP label */}
+                  <div className="cinema-lap-car" aria-hidden="true">
+                    <svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M5 35 L15 35 L20 25 L50 22 L75 24 L90 28 L95 32 L95 38 L90 42 L75 44 L50 43 L20 42 L10 40 Z"
+                        fill="#dc2626"
+                      />
+                      <path
+                        d="M35 22 L45 12 L65 12 L72 22 Z"
+                        fill="#1f1f28"
+                      />
+                      <path
+                        d="M45 14 L63 14 L70 22 L38 22 Z"
+                        fill="#3b82f6"
+                        opacity="0.6"
+                      />
+                      <circle cx="25" cy="40" r="8" fill="#111" />
+                      <circle cx="25" cy="40" r="4" fill="#444" />
+                      <circle cx="80" cy="40" r="8" fill="#111" />
+                      <circle cx="80" cy="40" r="4" fill="#444" />
+                      <ellipse cx="92" cy="30" rx="3" ry="4" fill="#fef08a" />
+                      <ellipse cx="8" cy="32" rx="2" ry="3" fill="#ef4444" />
+                      <path
+                        d="M20 30 L90 30"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        opacity="0.5"
+                      />
+                      <text
+                        x="50"
+                        y="35"
+                        fontSize="8"
+                        fill="#fff"
+                        fontWeight="bold"
+                        textAnchor="middle"
+                        fontFamily="Bebas Neue"
+                      >
+                        7
+                      </text>
+                    </svg>
+                  </div>
                 </motion.div>
 
                 <motion.div
@@ -806,45 +826,6 @@ function App() {
 
                 <div className="cinema-room-grid">
                   {/* Racing car driving around the cards */}
-                  <div className="cinema-racing-car">
-                    <svg viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Car body */}
-                      <path
-                        d="M5 35 L15 35 L20 25 L50 22 L75 24 L90 28 L95 32 L95 38 L90 42 L75 44 L50 43 L20 42 L10 40 Z"
-                        fill="#dc2626"
-                      />
-                      {/* Car top/cockpit */}
-                      <path
-                        d="M35 22 L45 12 L65 12 L72 22 Z"
-                        fill="#1f1f28"
-                      />
-                      {/* Windshield */}
-                      <path
-                        d="M45 14 L63 14 L70 22 L38 22 Z"
-                        fill="#3b82f6"
-                        opacity="0.6"
-                      />
-                      {/* Wheels */}
-                      <circle cx="25" cy="40" r="8" fill="#111" />
-                      <circle cx="25" cy="40" r="4" fill="#444" />
-                      <circle cx="80" cy="40" r="8" fill="#111" />
-                      <circle cx="80" cy="40" r="4" fill="#444" />
-                      {/* Headlight */}
-                      <ellipse cx="92" cy="30" rx="3" ry="4" fill="#fef08a" />
-                      {/* Taillight */}
-                      <ellipse cx="8" cy="32" rx="2" ry="3" fill="#ef4444" />
-                      {/* Racing stripe */}
-                      <path
-                        d="M20 30 L90 30"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        opacity="0.5"
-                      />
-                      {/* Number */}
-                      <text x="50" y="35" fontSize="8" fill="#fff" fontWeight="bold" textAnchor="middle" fontFamily="Bebas Neue">7</text>
-                    </svg>
-                  </div>
-
                   {serviceKeys.map((service, index) => (
                     <motion.article
                       key={service.titleKey}
@@ -984,9 +965,9 @@ function App() {
                 {/* Clickable Logos Track */}
                 <div className="trusted-logos-display">
                   <div className="trusted-logos-wrapper">
-                    {[...clientLogos, ...clientLogos].map((client, index) => (
+                    {clientLogos.map((client) => (
                       <motion.button
-                        key={`${client.name}-${index}`}
+                        key={client.name}
                         type="button"
                         className="trusted-logo-btn"
                         onClick={() => setSelectedPartner(client)}
