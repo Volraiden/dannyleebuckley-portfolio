@@ -87,7 +87,8 @@ const featuredWorkKeys = [
 function App() {
   const appRef = useRef<HTMLDivElement>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const { t, locale } = useLanguage();
+  const aiPreviewMessagesRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -145,6 +146,30 @@ function App() {
     }, 530);
     return () => window.clearInterval(interval);
   }, []);
+
+  // Auto-scroll the AI preview as the demo messages type in.
+  useEffect(() => {
+    const el = aiPreviewMessagesRef.current;
+    if (!el) return;
+
+    const scrollToBottom = () => {
+      el.scrollTop = el.scrollHeight;
+    };
+
+    scrollToBottom();
+
+    // TypewriterText can continue rendering after `isTyping` turns off,
+    // so we keep scrolling for a short window after a new message arrives.
+    const intervalId = window.setInterval(scrollToBottom, 180);
+    const timeoutId = window.setTimeout(() => {
+      window.clearInterval(intervalId);
+    }, 3800);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+    };
+  }, [chatMessages]);
 
   // Keep the full company list; if a logo file is missing, render a text fallback.
   const clientLogos = [
@@ -1115,7 +1140,7 @@ function App() {
               </button>
             </div>
             <div className="ai-chat-preview-body">
-              <div className="ai-preview-messages">
+              <div className="ai-preview-messages" ref={aiPreviewMessagesRef}>
                 {chatMessages.map((msg, index) => (
                   <motion.div
                     key={index}
