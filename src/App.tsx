@@ -44,38 +44,47 @@ const featuredWorkKeys = [
   { titleKey: 'featured3Title', categoryKey: 'featured3Category', copyKey: 'featured3Copy' },
 ];
 
-// Client logos - all companies I've worked with (Trusted By grid)
-const clientLogos = [
-  { name: 'Client 2', logo: '/images/logos/client2.png?v=6' },
-  { name: 'Client 3', logo: '/images/logos/client3.png?v=6' },
-  { name: 'Client 4', logo: '/images/logos/client4.png?v=6' },
-  { name: 'Client 5', logo: '/images/logos/client5.png?v=6' },
-  { name: 'Client 6', logo: '/images/logos/client6.png?v=6' },
-  { name: 'Client 7', logo: '/images/logos/client7.png?v=6' },
-  { name: '24H Series', logo: '/images/logos/24h-series.png?v=6' },
-  { name: 'ZBS', logo: '/images/logos/zbs.png?v=6' },
-  { name: 'Iguana Studios', logo: '/images/logos/iguana-studios.png?v=6' },
-  { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
-  { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
-  { name: 'LS', logo: '/images/logos/ls.png' },
-];
-
 function App() {
   const appRef = useRef<HTMLDivElement>(null);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
   const { t } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Only include logo files that actually exist in /public/images/logos.
+  const clientLogos = [
+    { name: '24H Series', logo: '/images/logos/24h-series.png' },
+    { name: 'FIA', logo: '/images/logos/fia.png' },
+    { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
+    { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
+    { name: 'LS', logo: '/images/logos/ls.png' },
+    { name: 'Duneworks Media', logo: '/images/logos/duneworks-media.png' },
+    { name: 'D Logo', logo: '/images/logos/d-logo.png' },
+  ];
 
   useEffect(() => {
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateMobileState = () => setIsMobile(mediaQuery.matches);
+    updateMobileState();
+    mediaQuery.addEventListener('change', updateMobileState);
+    return () => mediaQuery.removeEventListener('change', updateMobileState);
+  }, []);
+
+  useEffect(() => {
     const loaderDelay = isMobile ? 250 : 1200;
     const timer = window.setTimeout(() => {
       setIsLoading(false);
     }, loaderDelay);
 
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile || !heroVideoRef.current) return;
+    heroVideoRef.current.play().catch(() => {});
+  }, [isMobile]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -265,12 +274,18 @@ function App() {
         <section id="hero" className="hero-section">
           <div className="hero-video-container">
             <video
+              ref={heroVideoRef}
               autoPlay
               muted
               loop
               playsInline
               className="hero-video"
-              preload="auto"
+              preload={isMobile ? 'auto' : 'metadata'}
+              onLoadedData={() => {
+                if (isMobile && heroVideoRef.current) {
+                  heroVideoRef.current.play().catch(() => {});
+                }
+              }}
             >
               <source src="/videos/hero.mp4" type="video/mp4" />
             </video>
