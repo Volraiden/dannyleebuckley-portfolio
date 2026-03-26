@@ -875,17 +875,65 @@ function App() {
                 </div>
               </div>
 
-              {/* Viewfinder / EVF */}
+              {/* Professional Viewfinder with Trusted By Logos */}
               <div className="cam-viewfinder-section">
-                <div className="cam-viewfinder-housing">
-                  <div className="cam-evf-tube">
-                    <div className="cam-evf-glass">
-                      <div className="cam-evf-reflection" />
+                <div className="cam-evf-assembly">
+                  {/* Rubber eyecup like Sony A7 III */}
+                  <div className="cam-evf-eyecup">
+                    <div className="eyecup-rubber">
+                      <div className="eyecup-inner-ring" />
                     </div>
                   </div>
-                  <div className="cam-evf-brand">4K HDR</div>
+                  {/* Viewfinder housing */}
+                  <div className="cam-evf-housing">
+                    <div className="cam-evf-housing-top">
+                      <span className="evf-sensor-label">XGA OLED</span>
+                    </div>
+                    <div className="cam-evf-display">
+                      {/* Viewfinder screen showing logos */}
+                      <div className="evf-screen">
+                        <div className="evf-grid-overlay" />
+                        <div className="evf-logos-container">
+                          <div className="evf-logos-track">
+                            {/* First set of logos */}
+                            {clientLogos.slice(0, 5).map((client, idx) => (
+                              <div key={`a-${idx}`} className="evf-logo-item">
+                                <img
+                                  src={client.logo}
+                                  alt={client.name}
+                                  className="evf-logo-img"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.parentElement?.classList.add('fallback');
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            {/* Duplicated for smooth infinite scroll */}
+                            {clientLogos.slice(0, 5).map((client, idx) => (
+                              <div key={`b-${idx}`} className="evf-logo-item">
+                                <img
+                                  src={client.logo}
+                                  alt={client.name}
+                                  className="evf-logo-img"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    e.currentTarget.parentElement?.classList.add('fallback');
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="evf-badge">{t('trustedByBadge')}</div>
+                      </div>
+                    </div>
+                    <div className="cam-evf-branding">
+                      <span className="evf-brand-text">SONY</span>
+                      <span className="evf-model-text">FX6</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="cam-viewfinder-mount" />
               </div>
 
               {/* Main Monitor Screen */}

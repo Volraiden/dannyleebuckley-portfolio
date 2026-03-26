@@ -1707,67 +1707,205 @@ textarea {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Viewfinder / EVF Section */
+/* Professional Sony-style Viewfinder Section */
 .cam-viewfinder-section {
   display: flex;
-  align-items: flex-end;
   justify-content: center;
-  margin-bottom: -10px;
+  margin-bottom: -15px;
   position: relative;
-  z-index: 10;
+  z-index: 20;
 }
 
-.cam-viewfinder-housing {
+.cam-evf-assembly {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Rubber Eyecup - Sony A7 III style */
+.cam-evf-eyecup {
+  position: relative;
+  z-index: 5;
+}
+
+.eyecup-rubber {
+  width: 100px;
+  height: 55px;
+  background: linear-gradient(180deg,
+    #1a1a22 0%,
+    #0f0f14 30%,
+    #0a0a0f 50%,
+    #0f0f14 70%,
+    #1a1a22 100%);
+  border-radius: 50% 50% 40% 40%;
+  position: relative;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    inset 0 2px 3px rgba(255, 255, 255, 0.05);
+  display: grid;
+  place-items: center;
+}
+
+.eyecup-rubber::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 15px;
+  background: linear-gradient(180deg, #2a2a35, #1a1a22);
+  border-radius: 50%;
+}
+
+.eyecup-inner-ring {
+  width: 70px;
+  height: 35px;
+  border: 3px solid #0a0a0f;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #050508, #0a0a0f);
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.8),
+    0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Viewfinder Housing */
+.cam-evf-housing {
   background: linear-gradient(180deg, #2a2a38, #1f1f28);
-  border-radius: 16px 16px 0 0;
-  padding: 12px 16px 0;
+  border-radius: 12px 12px 0 0;
+  padding: 8px 12px 0;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: none;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.cam-evf-tube {
-  width: 60px;
-  height: 50px;
-  background: linear-gradient(180deg, #15151a, #0a0a0f);
-  border-radius: 12px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  margin-top: -5px;
   position: relative;
-  overflow: hidden;
-  border: 2px solid #3a3a48;
 }
 
-.cam-evf-glass {
-  position: absolute;
-  inset: 4px;
-  background: linear-gradient(135deg, rgba(100, 120, 200, 0.2), rgba(80, 100, 180, 0.1));
-  border-radius: 8px;
+.cam-evf-housing-top {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.cam-evf-reflection {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 15px;
-  height: 8px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent);
-  border-radius: 50%;
-  transform: rotate(-30deg);
-}
-
-.cam-evf-brand {
-  text-align: center;
-  font-size: 0.55rem;
-  letter-spacing: 0.1em;
+.evf-sensor-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
   color: rgba(255, 255, 255, 0.4);
-  margin-top: 6px;
   font-weight: 600;
 }
 
-.cam-viewfinder-mount {
+/* Viewfinder Display Screen */
+.cam-evf-display {
+  padding: 8px;
+  background: linear-gradient(180deg, #1a1a22, #0f0f14);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+.evf-screen {
+  width: 160px;
+  height: 100px;
+  background: linear-gradient(135deg, #0a0a0f 0%, #15151a 100%);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #1f1f28;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Grid overlay inside viewfinder */
+.evf-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* Logos container in viewfinder */
+.evf-logos-container {
+  width: 100%;
+  overflow: hidden;
+  padding: 8px 0;
+}
+
+.evf-logos-track {
+  display: flex;
+  gap: 12px;
+  animation: evfLogoScroll 8s linear infinite;
+  padding: 0 8px;
+}
+
+.evf-logo-item {
+  flex-shrink: 0;
   width: 40px;
-  height: 15px;
-  background: linear-gradient(180deg, #3a3a48, #2a2a35);
-  margin-top: -1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.evf-logo-item.fallback {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.evf-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: grayscale(100%) brightness(1.2);
+}
+
+/* Trusted badge in viewfinder */
+.evf-badge {
+  position: absolute;
+  bottom: 8px;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes evfLogoScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Viewfinder Branding */
+.cam-evf-branding {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 0;
+  background: linear-gradient(180deg, #1f1f28, #15151a);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.evf-brand-text {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
+
+.evf-model-text {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* Main Monitor Bezel */
@@ -2235,6 +2373,64 @@ textarea {
 
 :root[data-theme='light'] .trusted-count {
   color: rgba(59, 130, 246, 0.9);
+}
+
+/* Light theme - Viewfinder */
+:root[data-theme='light'] .eyecup-rubber {
+  background: linear-gradient(180deg,
+    #2a2a35 0%,
+    #1f1f28 30%,
+    #1a1a22 50%,
+    #1f1f28 70%,
+    #2a2a35 100%);
+}
+
+:root[data-theme='light'] .eyecup-inner-ring {
+  background: linear-gradient(180deg, #0a0a0f, #101015);
+}
+
+:root[data-theme='light'] .cam-evf-housing {
+  background: linear-gradient(180deg, #e8e8f0, #d8d8e0);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .cam-evf-display {
+  background: linear-gradient(180deg, #f0f0f8, #e8e8f0);
+}
+
+:root[data-theme='light'] .evf-screen {
+  background: linear-gradient(135deg, #f8f8fc 0%, #f0f0f5 100%);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .evf-grid-overlay {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
+
+:root[data-theme='light'] .evf-logo-item {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .evf-logo-img {
+  filter: grayscale(100%) brightness(0.8);
+}
+
+:root[data-theme='light'] .evf-badge {
+  color: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .cam-evf-branding {
+  background: linear-gradient(180deg, #e0e0e8, #d0d0d8);
+}
+
+:root[data-theme='light'] .evf-brand-text,
+:root[data-theme='light'] .evf-model-text {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 /* Client Logos Section - Enhanced & Bigger */
