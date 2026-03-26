@@ -87,7 +87,7 @@ const featuredWorkKeys = [
 function App() {
   const appRef = useRef<HTMLDivElement>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [chatOpen, setChatOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -168,13 +168,6 @@ function App() {
     { name: 'Trusted Partner 3', logo: '/images/logos/new-trusted-3.webp' },
   ];
   const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
-  const cameraDetails = [
-    t('service1Title'),
-    t('service2Title'),
-    t('service3Title'),
-    t('service4Title'),
-    t('service5Title'),
-  ];
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('site-theme');
@@ -217,12 +210,13 @@ function App() {
     heroVideoRef.current.play().catch(() => {});
   }, [isMobile]);
 
+  // Camera detail rotation - cycles through 5 services every 2 seconds
   useEffect(() => {
     const interval = window.setInterval(() => {
-      setCameraDetailIndex((prev) => (prev + 1) % cameraDetails.length);
-    }, 1600);
+      setCameraDetailIndex((prev) => (prev + 1) % 5);
+    }, 2000);
     return () => window.clearInterval(interval);
-  }, [cameraDetails.length]);
+  }, []);
 
   useEffect(() => {
     // On mobile, preload logos so the "Trusted By" grid appears faster.
@@ -500,6 +494,17 @@ function App() {
             </div>
             <div className="about-hero-image js-reveal">
               <div className="camera-card" aria-hidden="true">
+                {/* Viewfinder Eyepiece */}
+                <div className="camera-viewfinder-eyepiece">
+                  <div className="eyepiece-tube">
+                    <div className="eyepiece-glass">
+                      <div className="eyepiece-reflection" />
+                    </div>
+                  </div>
+                  <div className="eyepiece-rubber">
+                    <div className="eyepiece-rubber-ring" />
+                  </div>
+                </div>
                 <div className="camera-body">
                   <div className="camera-top">
                     <span className="camera-indicator" />
@@ -507,13 +512,30 @@ function App() {
                   </div>
                   <div className="camera-screen">
                     <motion.div
-                      key={cameraDetails[cameraDetailIndex]}
+                      key={`title-${cameraDetailIndex}-${locale}`}
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35 }}
                       className="camera-screen-text"
                     >
-                      {cameraDetails[cameraDetailIndex]}
+                      {cameraDetailIndex === 0 && t('service1Title')}
+                      {cameraDetailIndex === 1 && t('service2Title')}
+                      {cameraDetailIndex === 2 && t('service3Title')}
+                      {cameraDetailIndex === 3 && t('service4Title')}
+                      {cameraDetailIndex === 4 && t('service5Title')}
+                    </motion.div>
+                    <motion.div
+                      key={`detail-${cameraDetailIndex}-${locale}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2, duration: 0.3 }}
+                      className="camera-screen-subtext"
+                    >
+                      {cameraDetailIndex === 0 && t('service1Desc').split('.')[0]}
+                      {cameraDetailIndex === 1 && t('service2Desc').split('.')[0]}
+                      {cameraDetailIndex === 2 && t('service3Desc').split('.')[0]}
+                      {cameraDetailIndex === 3 && t('service4Desc').split('.')[0]}
+                      {cameraDetailIndex === 4 && t('service5Desc').split('.')[0]}
                     </motion.div>
                     <div className="camera-screen-lines" />
                   </div>

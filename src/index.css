@@ -1305,6 +1305,82 @@ textarea {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Viewfinder Eyepiece */
+.camera-viewfinder-eyepiece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 10;
+}
+
+.eyepiece-tube {
+  width: 50px;
+  height: 40px;
+  background: linear-gradient(180deg, #2a2a35, #1a1a25);
+  border-radius: 8px 8px 0 0;
+  border: 2px solid #3a3a48;
+  border-bottom: none;
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.eyepiece-glass {
+  width: 30px;
+  height: 25px;
+  background: linear-gradient(135deg, rgba(100, 120, 200, 0.3), rgba(80, 100, 180, 0.15));
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.eyepiece-reflection {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 5px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), transparent);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+
+.eyepiece-rubber {
+  width: 70px;
+  height: 20px;
+  background: linear-gradient(180deg, #1a1a22, #0f0f14);
+  border-radius: 0 0 35px 35px;
+  display: grid;
+  place-items: center;
+  margin-top: -2px;
+}
+
+.eyepiece-rubber-ring {
+  width: 50px;
+  height: 12px;
+  border: 2px solid #2a2a35;
+  border-radius: 0 0 25px 25px;
+  border-top: none;
+}
+
+/* Camera Screen Subtext */
+.camera-screen-subtext {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  max-width: 80%;
+  z-index: 2;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.4;
+}
+
 @keyframes cameraBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
@@ -1313,6 +1389,41 @@ textarea {
 @keyframes cameraScan {
   from { transform: translateY(0); }
   to { transform: translateY(6px); }
+}
+
+/* Light theme - Camera Card */
+:root[data-theme='light'] .camera-body {
+  background: linear-gradient(180deg, rgba(230, 230, 235, 0.95), rgba(210, 210, 218, 0.98));
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme='light'] .camera-screen {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(80, 110, 255, 0.1), transparent 70%),
+    linear-gradient(180deg, rgba(245, 245, 250, 1), rgba(235, 235, 242, 1));
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme='light'] .camera-screen-text {
+  color: #1a1a24;
+  text-shadow: none;
+}
+
+:root[data-theme='light'] .camera-screen-subtext {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme='light'] .eyepiece-tube {
+  background: linear-gradient(180deg, #3a3a48, #2a2a35);
+  border-color: #4a4a58;
+}
+
+:root[data-theme='light'] .eyepiece-rubber {
+  background: linear-gradient(180deg, #2a2a35, #1a1a22);
+}
+
+:root[data-theme='light'] .eyepiece-rubber-ring {
+  border-color: #3a3a48;
 }
 
 @media (max-width: 900px) {
