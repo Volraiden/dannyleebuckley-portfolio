@@ -1286,14 +1286,14 @@ textarea {
 
 /* Client Logos Section */
 .clients-section {
-  margin-top: 80px;
-  padding-top: 80px;
+  margin-top: 54px;
+  padding-top: 44px;
   border-top: 1px solid var(--border);
 }
 
 .clients-header {
   text-align: center;
-  margin-bottom: 48px;
+  margin-bottom: 18px;
 }
 
 .clients-header h3 {
@@ -1315,6 +1315,73 @@ textarea {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+.camera-trusted-strip {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-elevated));
+  overflow: hidden;
+}
+
+.camera-trusted-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.camera-trusted-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+  animation: cameraBlink 1.2s ease-in-out infinite;
+}
+
+.camera-trusted-label {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.camera-trusted-track {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.camera-trusted-row {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  padding: 12px 14px;
+  animation: trustedMarquee 26s linear infinite;
+}
+
+.camera-trusted-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  min-height: 70px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.camera-trusted-strip:hover .camera-trusted-row {
+  animation-play-state: paused;
+}
+
+@keyframes trustedMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 .client-logo {
@@ -1355,6 +1422,58 @@ textarea {
   letter-spacing: 0.03em;
   text-align: center;
   white-space: normal;
+}
+
+.mini-booking-card {
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  text-align: center;
+}
+
+.mini-booking-kicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mini-booking-card h4 {
+  margin: 10px 0 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.02em;
+}
+
+.mini-booking-copy {
+  margin: 0 auto;
+  max-width: 560px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.mini-booking-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mini-booking-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .client-logo:hover .client-logo-img {
@@ -1755,10 +1874,6 @@ textarea {
 }
 
 @media (max-width: 1024px) {
-  .clients-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
   .social-links-row {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1961,8 +2076,9 @@ textarea {
     padding: 80px 0;
   }
   
-  .clients-grid {
-    grid-template-columns: 1fr;
+  .camera-trusted-logo {
+    min-width: 104px;
+    min-height: 62px;
   }
 
   .social-links-row {

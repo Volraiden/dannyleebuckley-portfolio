@@ -561,37 +561,53 @@ function App() {
               <p>{t('clientsSubtext')}</p>
             </div>
 
-            <div className="clients-grid stagger-grid">
-              {clientLogos.map((client, index) => (
-                <motion.div
-                  key={client.name}
-                  className="client-logo stagger-item"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.08 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -4, scale: 1.05 }}
-                >
-                  {brokenLogos[client.name] ? (
-                    <span className="client-logo-fallback">{client.name}</span>
-                  ) : (
-                    <img
-                      src={client.logo}
-                      alt={client.name}
-                      className="client-logo-img"
-                      loading={isMobile ? 'eager' : 'lazy'}
-                      fetchPriority={isMobile && index < 6 ? 'high' : 'auto'}
-                      decoding="async"
-                      onError={() =>
-                        setBrokenLogos((prev) => ({
-                          ...prev,
-                          [client.name]: true,
-                        }))
-                      }
-                    />
-                  )}
-                </motion.div>
-              ))}
+            <div className="camera-trusted-strip">
+              <div className="camera-trusted-top">
+                <span className="camera-trusted-dot" />
+                <span className="camera-trusted-label">Viewfinder</span>
+              </div>
+              <div className="camera-trusted-track">
+                <div className="camera-trusted-row">
+                  {[...clientLogos, ...clientLogos].map((client, index) => (
+                    <div key={`${client.name}-${index}`} className="camera-trusted-logo">
+                      {brokenLogos[client.name] ? (
+                        <span className="client-logo-fallback">{client.name}</span>
+                      ) : (
+                        <img
+                          src={client.logo}
+                          alt={client.name}
+                          className="client-logo-img"
+                          loading={isMobile ? 'eager' : 'lazy'}
+                          fetchPriority={isMobile && index < 8 ? 'high' : 'auto'}
+                          decoding="async"
+                          onError={() =>
+                            setBrokenLogos((prev) => ({
+                              ...prev,
+                              [client.name]: true,
+                            }))
+                          }
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mini-booking-card js-reveal">
+              <p className="mini-booking-kicker">Available for bookings</p>
+              <h4>Book me for your next project or call</h4>
+              <p className="mini-booking-copy">
+                Fast response for events, brand shoots, and commercial collaborations.
+              </p>
+              <a
+                href="https://cal.com/danielleebuckley"
+                target="_blank"
+                rel="noreferrer"
+                className="mini-booking-btn"
+              >
+                Book Me on Cal.com
+              </a>
             </div>
           </div>
 
