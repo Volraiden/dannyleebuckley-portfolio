@@ -6,6 +6,7 @@ import {
   Camera,
   Clapperboard,
   Code,
+  CalendarDays,
   Instagram,
   Mail,
   Youtube,
@@ -67,9 +68,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const loaderDelay = isMobile ? 250 : 1200;
     const timer = window.setTimeout(() => {
       setIsLoading(false);
-    }, 2200);
+    }, loaderDelay);
 
     return () => window.clearTimeout(timer);
   }, []);
@@ -211,11 +214,13 @@ function App() {
           <LanguageSwitcher />
           <motion.a 
             className="header-cta" 
-            href="#contact"
+            href="https://cal.com/danielleebuckley"
+            target="_blank"
+            rel="noreferrer"
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            {t('bookProject')}
+            Book a Call
           </motion.a>
           <button
             type="button"
@@ -238,8 +243,14 @@ function App() {
           <button type="button" onClick={() => { setChatOpen(true); setMobileMenuOpen(false); }}>
             {t('navAIChat')}
           </button>
-          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-cta">
-            {t('bookProject')}
+          <a
+            href="https://cal.com/danielleebuckley"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="mobile-menu-cta"
+          >
+            Book a Call
           </a>
         </nav>
         <div className="mobile-menu-lang">
@@ -259,7 +270,6 @@ function App() {
               loop
               playsInline
               className="hero-video"
-              poster="/images/logos/duneworks.png"
               preload="auto"
             >
               <source src="/videos/hero.mp4" type="video/mp4" />
@@ -471,6 +481,22 @@ function App() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
+            <motion.a 
+              href="https://cal.com/danielleebuckley"
+              target="_blank"
+              rel="noreferrer"
+              className="social-btn booking-btn"
+              whileHover={{ y: -5, scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <CalendarDays size={28} />
+              <div className="social-btn-text">
+                <span className="social-label">Book a Call</span>
+                <span className="social-handle">cal.com/danielleebuckley</span>
+              </div>
+              <ExternalLink size={16} className="social-arrow" />
+            </motion.a>
+
             <motion.a 
               href="https://instagram.com/Buckley.lens" 
               target="_blank" 
