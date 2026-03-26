@@ -64,7 +64,6 @@ function App() {
     { name: 'ZBS', logo: '/images/logos/zbs.png' },
     { name: 'Iguana Studios', logo: '/images/logos/iguana-studios.png' },
     { name: '24H Series', logo: '/images/logos/24h-series.png' },
-    { name: 'FIA', logo: '/images/logos/fia.png' },
     { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
     { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
     { name: 'LS', logo: '/images/logos/ls.png' },
@@ -211,7 +210,7 @@ function App() {
           transition={{ duration: 0.3 }}
         >
           <img 
-            src="/images/profile.png" 
+            src="/images/profile-top-left.webp" 
             alt="Daniel Lee Buckley"
             className="profile-photo"
           />
