@@ -102,6 +102,8 @@ function App() {
   const [isTyping, setIsTyping] = useState(false);
   const [userInput] = useState('');
   const [showInputCursor, setShowInputCursor] = useState(true);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   const chatDemoSequence = [
     { type: 'user' as const, text: 'Can I book you for an event shoot next week?' },
@@ -226,9 +228,56 @@ function App() {
   };
 
   useEffect(() => {
-    if (!isMobile || !heroVideoRef.current) return;
-    heroVideoRef.current.play().catch(() => {});
-  }, [isMobile]);
+    const video = heroVideoRef.current;
+    if (!video) return;
+
+    // Optimize video loading for both PC and mobile
+    video.load();
+
+    const playVideo = async () => {
+      try {
+        if (video.paused) {
+          await video.play();
+        }
+      } catch (err) {
+        console.log('Video autoplay prevented:', err);
+        setVideoError(true);
+      }
+    };
+
+    // Try to play immediately and on load
+    playVideo();
+
+    video.addEventListener('loadeddata', () => {
+      setVideoLoaded(true);
+      playVideo();
+    });
+
+    video.addEventListener('canplay', () => {
+      setVideoLoaded(true);
+      playVideo();
+    });
+
+    video.addEventListener('error', () => {
+      console.log('Video error occurred');
+      setVideoError(true);
+    });
+
+    // Retry play on user interaction if autoplay was blocked
+    const handleInteraction = () => {
+      playVideo();
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -465,19 +514,27 @@ function App() {
       <main>
         <section id="hero" className="hero-section">
           <div className="hero-video-container">
+            {/* Video loading placeholder */}
+            {!videoLoaded && !videoError && (
+              <div className="hero-video-placeholder">
+                <div className="video-loading-spinner" />
+              </div>
+            )}
             <video
               ref={heroVideoRef}
               autoPlay
               muted
               loop
               playsInline
-              className="hero-video"
-              preload={isMobile ? 'auto' : 'metadata'}
-              onLoadedData={() => {
-                if (isMobile && heroVideoRef.current) {
-                  heroVideoRef.current.play().catch(() => {});
-                }
-              }}
+              className={`hero-video ${videoLoaded ? 'loaded' : ''}`}
+              preload="auto"
+              fetchPriority="high"
+              poster="/images/profile-top-left.webp"
+              disablePictureInPicture
+              disableRemotePlayback
+              onLoadedData={() => setVideoLoaded(true)}
+              onCanPlay={() => setVideoLoaded(true)}
+              onError={() => setVideoError(true)}
             >
               <source src="/videos/hero.mp4" type="video/mp4" />
             </video>

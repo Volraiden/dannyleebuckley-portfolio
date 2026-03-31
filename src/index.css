@@ -5615,3 +5615,121 @@ textarea {
     display: none !important;
   }
 }
+
+/* ============================================
+   VIDEO LOADING OPTIMIZATIONS
+   ============================================ */
+
+/* Video loading placeholder */
+.hero-video-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(135deg, #0d0d0f 0%, #1a1a1f 50%, #0d0d0f 100%);
+}
+
+.hero-video-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 20%, rgba(100, 100, 110, 0.08), transparent),
+    radial-gradient(ellipse 50% 30% at 70% 80%, rgba(80, 80, 90, 0.06), transparent);
+}
+
+.video-loading-spinner {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.8);
+  animation: videoSpinner 0.8s linear infinite;
+}
+
+.video-loading-spinner::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  border-top-color: rgba(255, 255, 255, 0.4);
+  animation: videoSpinner 1.2s linear infinite reverse;
+}
+
+@keyframes videoSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Video transition when loaded */
+.hero-video {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.hero-video.loaded {
+  opacity: 1;
+}
+
+/* Video poster styling - ensures it covers properly */
+.hero-video[poster] {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Fallback for when video fails to load */
+.hero-video-container.video-error {
+  background:
+    linear-gradient(180deg, #0d0d0f 0%, #15151a 50%, #0d0d0f 100%);
+}
+
+.hero-video-container.video-error::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 20%, rgba(100, 100, 110, 0.1), transparent),
+    radial-gradient(ellipse 50% 30% at 70% 80%, rgba(80, 80, 90, 0.08), transparent);
+  z-index: 0;
+}
+
+/* Ensure video container is ready */
+.hero-video-container {
+  background: #0a0a0b;
+}
+
+/* Mobile video optimizations */
+@media (max-width: 768px) {
+  .hero-video {
+    /* Force hardware acceleration on mobile */
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .video-loading-spinner {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .video-loading-spinner {
+    animation: none;
+    border-top-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .video-loading-spinner::after {
+    animation: none;
+  }
+
+  .hero-video {
+    transition: none;
+    opacity: 1;
+  }
+}
