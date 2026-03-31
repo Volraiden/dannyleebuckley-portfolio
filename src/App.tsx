@@ -628,8 +628,9 @@ function App() {
             </div>
           </div>
 
+          {/* Desktop Cinema Room - Hidden on Mobile */}
           <motion.div
-            className="cinema-room js-reveal"
+            className="cinema-room js-reveal desktop-only"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -802,6 +803,66 @@ function App() {
               </div>
             </div>
           </motion.div>
+
+          {/* Mobile Services Showcase - Shown only on Mobile */}
+          <div className="mobile-services-showcase">
+            <div className="mobile-services-header">
+              <span className="mobile-services-label">What I Do</span>
+              <h3 className="mobile-services-title">Services</h3>
+            </div>
+            <div className="mobile-services-grid">
+              {serviceKeys.map((service, index) => (
+                <motion.div
+                  key={service.titleKey}
+                  className="mobile-service-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="mobile-service-icon">
+                    <service.icon size={20} />
+                  </div>
+                  <div className="mobile-service-content">
+                    <h4>{t(service.titleKey)}</h4>
+                    <p>{t(service.descKey)}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="mobile-featured-header">
+              <span className="mobile-services-label">Featured</span>
+              <h3 className="mobile-services-title">Work</h3>
+            </div>
+            <div className="mobile-featured-grid">
+              {featuredWorkKeys.map((item, index) => (
+                <motion.div
+                  key={item.titleKey}
+                  className="mobile-featured-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.15 }}
+                  viewport={{ once: true }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="mobile-featured-category">{t(item.categoryKey)}</span>
+                  <h4>{t(item.titleKey)}</h4>
+                  <p>{t(item.copyKey)}</p>
+                  <a
+                    href="https://instagram.com/Buckley.lens"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mobile-featured-link"
+                  >
+                    <span>View on Instagram</span>
+                    <ExternalLink size={14} />
+                  </a>
+                </motion.div>
+              ))}
+            </div>
+          </div>
 
           <div className="clients-section">
             <div className="clients-header js-reveal">
