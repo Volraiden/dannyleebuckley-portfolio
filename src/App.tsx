@@ -483,30 +483,78 @@ function App() {
         </div>
       </header>
 
-      <div className={`mobile-menu ${mobileMenuOpen ? 'mobile-menu-open' : ''}`} aria-hidden={!mobileMenuOpen}>
-        <nav className="mobile-nav" aria-label="Mobile">
-          <a href="#about" onClick={() => setMobileMenuOpen(false)}>{t('navAbout')}</a>
-          <a href="#work" onClick={() => setMobileMenuOpen(false)}>{t('navWork')}</a>
-          <a href="#contact" onClick={() => setMobileMenuOpen(false)}>{t('navContact')}</a>
-          <button type="button" onClick={() => { setChatOpen(true); setMobileMenuOpen(false); }}>
-            {t('navAIChat')}
-          </button>
-          <button type="button" className="mobile-theme-toggle" onClick={toggleTheme}>
-            {theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-          </button>
+      {/* Modern Mobile Navbar Sheet */}
+      <div className={`mobile-nav-sheet ${mobileMenuOpen ? 'mobile-nav-open' : ''}`} aria-hidden={!mobileMenuOpen}>
+        <div className="mobile-nav-backdrop" onClick={() => setMobileMenuOpen(false)} />
+        <motion.div
+          className="mobile-nav-content"
+          initial={false}
+          animate={mobileMenuOpen ? { y: 0, opacity: 1 } : { y: -20, opacity: 0 }}
+          transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          {/* Nav Links as Row Cards */}
+          <nav className="mobile-nav-rows" aria-label="Mobile">
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-row">
+              <div className="mobile-nav-icon about-icon">
+                <span className="nav-icon-dot" />
+              </div>
+              <span className="mobile-nav-label">{t('navAbout')}</span>
+              <span className="mobile-nav-arrow">→</span>
+            </a>
+            <a href="#work" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-row">
+              <div className="mobile-nav-icon work-icon">
+                <span className="nav-icon-dot" />
+              </div>
+              <span className="mobile-nav-label">{t('navWork')}</span>
+              <span className="mobile-nav-arrow">→</span>
+            </a>
+            <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-row">
+              <div className="mobile-nav-icon contact-icon">
+                <span className="nav-icon-dot" />
+              </div>
+              <span className="mobile-nav-label">{t('navContact')}</span>
+              <span className="mobile-nav-arrow">→</span>
+            </a>
+          </nav>
+
+          {/* Quick Actions Row */}
+          <div className="mobile-nav-actions">
+            <button
+              type="button"
+              className="mobile-action-btn chat-btn"
+              onClick={() => { setChatOpen(true); setMobileMenuOpen(false); }}
+            >
+              <span className="action-icon">💬</span>
+              <span className="action-label">{t('navAIChat')}</span>
+            </button>
+            <button
+              type="button"
+              className="mobile-action-btn theme-btn"
+              onClick={toggleTheme}
+            >
+              <span className="action-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="action-label">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+            </button>
+          </div>
+
+          {/* CTA Section */}
           <a
             href="https://cal.com/danielleebuckley"
             target="_blank"
             rel="noreferrer"
             onClick={() => setMobileMenuOpen(false)}
-            className="mobile-menu-cta"
+            className="mobile-nav-cta"
           >
-            Book a Call
+            <span className="cta-icon">📅</span>
+            <span className="cta-text">Book a Call</span>
+            <span className="cta-arrow">→</span>
           </a>
-        </nav>
-        <div className="mobile-menu-lang">
-          <LanguageSwitcher />
-        </div>
+
+          {/* Language Switcher at Bottom */}
+          <div className="mobile-nav-footer">
+            <LanguageSwitcher />
+          </div>
+        </motion.div>
       </div>
 
       <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
