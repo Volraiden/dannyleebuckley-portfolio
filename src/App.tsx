@@ -186,6 +186,7 @@ function App() {
     { name: 'Trusted Partner 2', logo: '/images/logos/new-trusted-2.png' },
     { name: 'Trusted Partner 3', logo: '/images/logos/new-trusted-3.webp' },
   ];
+  const displayedClientLogos = isMobile ? clientLogos : [...clientLogos, ...clientLogos];
   const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -1017,40 +1018,9 @@ function App() {
 
                 <div className="trusted-logos-display" ref={trustedLogosDisplayRef}>
                   <div className="trusted-logos-wrapper">
-                    {/* First set of logos */}
-                    {clientLogos.map((client) => (
+                    {displayedClientLogos.map((client, index) => (
                       <motion.button
-                        key={`${client.name}-1`}
-                        type="button"
-                        className="trusted-logo-btn"
-                        onClick={() => setSelectedPartner(client)}
-                        whileHover={{ scale: 1.1, zIndex: 10 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                      >
-                        {brokenLogos[client.name] ? (
-                          <span className="trusted-logo-fallback">{client.name}</span>
-                        ) : (
-                          <img
-                            src={client.logo}
-                            alt={client.name}
-                            className="trusted-logo-display-img"
-                            loading={isMobile ? 'eager' : 'lazy'}
-                            decoding="async"
-                            onError={() =>
-                              setBrokenLogos((prev) => ({
-                                ...prev,
-                                [client.name]: true,
-                              }))
-                            }
-                          />
-                        )}
-                      </motion.button>
-                    ))}
-                    {/* Duplicate set for seamless infinite scroll */}
-                    {clientLogos.map((client) => (
-                      <motion.button
-                        key={`${client.name}-2`}
+                        key={`${client.name}-${index}`}
                         type="button"
                         className="trusted-logo-btn"
                         onClick={() => setSelectedPartner(client)}

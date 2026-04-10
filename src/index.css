@@ -5635,9 +5635,18 @@ textarea {
     border-radius: 12px;
   }
 
+  .trusted-logos-display {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .trusted-logos-wrapper {
+    animation: none;
+    transform: none;
+    flex-wrap: wrap;
     gap: 12px;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   /* Mobile Duneworks Section */
