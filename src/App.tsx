@@ -171,10 +171,13 @@ function App() {
   }, [chatMessages]);
 
   const clientLogos = [
-    { name: 'Client 2', logo: '/images/logos/client2.svg' },
-    { name: 'Client 3', logo: '/images/logos/client3.svg' },
-    { name: 'ZBS', logo: '/images/logos/zbs.svg' },
-    { name: 'Iguana Studios', logo: '/images/logos/iguana-studios.svg' },
+    { name: 'Client 2', logo: 'https://danielbuckley.pics/images/logos/client2.png' },
+    { name: 'Client 3', logo: 'https://danielbuckley.pics/images/logos/client3.png' },
+    { name: 'Client 4', logo: 'https://danielbuckley.pics/images/logos/client4.png' },
+    { name: 'Client 5', logo: 'https://danielbuckley.pics/images/logos/client5.png' },
+    { name: 'Client 6', logo: 'https://danielbuckley.pics/images/logos/client6.png' },
+    { name: 'ZBS', logo: 'https://danielbuckley.pics/images/logos/zbs.png' },
+    { name: 'Iguana Studios', logo: 'https://danielbuckley.pics/images/logos/iguana-studios.png' },
     { name: '24H Series', logo: '/images/logos/24h-series.png' },
     { name: 'Asian Le Mans Series', logo: '/images/logos/asian-le-mans.png' },
     { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
