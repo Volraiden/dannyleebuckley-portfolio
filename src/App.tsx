@@ -574,7 +574,6 @@ function App() {
               playsInline
               className={`hero-video ${videoLoaded ? 'loaded' : ''}`}
               preload="auto"
-              fetchPriority="high"
               poster="/images/profile-top-left.webp"
               disablePictureInPicture
               disableRemotePlayback
