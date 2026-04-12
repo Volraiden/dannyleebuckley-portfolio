@@ -5637,10 +5637,18 @@ textarea {
   }
 
   .trusted-logos-display {
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: hidden;
     padding: 22px 10px;
-    cursor: default;
+    cursor: grab;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pinch-zoom;
+    scrollbar-width: thin;
+  }
+
+  .trusted-logos-display:active {
+    cursor: grabbing;
   }
 
   .trusted-logos-wrapper {
@@ -5649,7 +5657,7 @@ textarea {
     align-items: center;
     gap: 14px;
     width: max-content;
-    animation: trustedAutoScroll 42s linear infinite;
+    animation: none;
   }
 
   /* Mobile Duneworks Section */

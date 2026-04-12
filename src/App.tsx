@@ -216,6 +216,82 @@ function App() {
     return () => mediaQuery.removeEventListener('change', updateMobileState);
   }, []);
 
+  /** Mobile: native horizontal scroll + rAF auto-advance; pauses on finger interaction and when partner modal is open */
+  useEffect(() => {
+    if (!isMobile || selectedPartner) return;
+
+    const root = trustedLogosDisplayRef.current;
+    if (!root) return;
+
+    const wrapper = root.querySelector<HTMLElement>('.trusted-logos-wrapper');
+    if (!wrapper) return;
+
+    let rafId = 0;
+    let resumeTimer: ReturnType<typeof window.setTimeout> | undefined;
+    let userPaused = false;
+
+    const clearResumeTimer = () => {
+      if (resumeTimer !== undefined) {
+        window.clearTimeout(resumeTimer);
+        resumeTimer = undefined;
+      }
+    };
+
+    const pauseAuto = () => {
+      userPaused = true;
+      clearResumeTimer();
+    };
+
+    const scheduleResume = () => {
+      clearResumeTimer();
+      resumeTimer = window.setTimeout(() => {
+        userPaused = false;
+        resumeTimer = undefined;
+      }, 2200);
+    };
+
+    const onTouchStart = () => pauseAuto();
+    const onTouchEnd = () => scheduleResume();
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') pauseAuto();
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') scheduleResume();
+    };
+
+    const speedPxPerFrame = 0.48;
+
+    const tick = () => {
+      const half = wrapper.scrollWidth / 2;
+      if (!userPaused && half > 1) {
+        let next = root.scrollLeft + speedPxPerFrame;
+        if (next >= half) next -= half;
+        root.scrollLeft = next;
+      }
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    root.addEventListener('touchstart', onTouchStart, { passive: true });
+    root.addEventListener('touchend', onTouchEnd, { passive: true });
+    root.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    root.addEventListener('pointerdown', onPointerDown);
+    root.addEventListener('pointerup', onPointerUp);
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      clearResumeTimer();
+      root.removeEventListener('touchstart', onTouchStart);
+      root.removeEventListener('touchend', onTouchEnd);
+      root.removeEventListener('touchcancel', onTouchEnd);
+      root.removeEventListener('pointerdown', onPointerDown);
+      root.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [isMobile, selectedPartner]);
+
   useEffect(() => {
     const loaderDelay = isMobile ? 250 : 1200;
     const timer = window.setTimeout(() => {
