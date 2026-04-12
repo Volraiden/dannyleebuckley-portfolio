@@ -5622,31 +5622,34 @@ textarea {
     padding: 24px;
   }
 
-  /* Mobile Trusted Display */
+  /* Mobile Trusted Display — horizontal marquee + auto-scroll (matches desktop loop) */
   .trusted-display-monitor {
     border-radius: 20px;
     padding: 14px;
   }
 
   .trusted-logo-btn {
-    width: calc(50% - 8px);
+    width: 104px;
     height: 80px;
-    padding: 12px;
-    border-radius: 12px;
+    min-width: 104px;
+    padding: 10px 12px;
+    border-radius: 10px;
   }
 
   .trusted-logos-display {
     overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: hidden;
+    padding: 22px 10px;
+    cursor: default;
   }
 
   .trusted-logos-wrapper {
-    animation: none;
-    transform: none;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: flex-start;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 14px;
+    width: max-content;
+    animation: trustedAutoScroll 42s linear infinite;
   }
 
   /* Mobile Duneworks Section */

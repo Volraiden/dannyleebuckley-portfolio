@@ -189,7 +189,8 @@ function App() {
     { name: 'Trusted Partner 2', logo: '/images/logos/new-trusted-2.png' },
     { name: 'Trusted Partner 3', logo: '/images/logos/new-trusted-3.webp' },
   ];
-  const displayedClientLogos = isMobile ? clientLogos : [...clientLogos, ...clientLogos];
+  // Duplicated set required: CSS keyframes scroll to -50% for a seamless infinite loop
+  const displayedClientLogos = [...clientLogos, ...clientLogos];
   const [brokenLogos, setBrokenLogos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
