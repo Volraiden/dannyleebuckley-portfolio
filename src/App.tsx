@@ -183,6 +183,7 @@ function App() {
     { name: 'OSCAR Academy', logo: '/images/logos/oscar-academy.png' },
     { name: 'LS', logo: '/images/logos/ls.png' },
     { name: 'FIA', logo: '/images/logos/fia.png' },
+    { name: 'Red Bull', logo: 'https://i.postimg.cc/2CLJ7G72/image-2026-05-07-174957466-Photoroom.png' },
     { name: 'Duneworks Media', logo: '/images/logos/duneworks-media.png' },
     { name: 'D Logo', logo: '/images/logos/d-logo.png' },
     { name: 'Trusted Partner 1', logo: '/images/logos/new-trusted-1.png' },
@@ -216,7 +217,7 @@ function App() {
     return () => mediaQuery.removeEventListener('change', updateMobileState);
   }, []);
 
-  /** Mobile: native horizontal scroll + rAF auto-advance — auto pauses while fingers are down, after user scroll/momentum, and when partner modal is open */
+  /** Mobile: continuously auto-advance the trusted logos strip */
   useEffect(() => {
     if (!isMobile || selectedPartner) return;
 
@@ -227,76 +228,23 @@ function App() {
     if (!wrapper) return;
 
     let rafId = 0;
-    let resumeTimer: ReturnType<typeof window.setTimeout> | undefined;
-    /** false = do not advance scrollLeft in rAF (user is interacting or cooling down) */
-    let autoScrollEnabled = true;
-    let activeTouchCount = 0;
-    /** > 0 while we set scrollLeft from auto-advance so `scroll` events are not treated as user input */
-    let programmaticScrollDepth = 0;
-
-    const clearResumeTimer = () => {
-      if (resumeTimer !== undefined) {
-        window.clearTimeout(resumeTimer);
-        resumeTimer = undefined;
-      }
-    };
-
-    const disableAutoTemporarily = () => {
-      autoScrollEnabled = false;
-      clearResumeTimer();
-      resumeTimer = window.setTimeout(() => {
-        autoScrollEnabled = true;
-        resumeTimer = undefined;
-      }, 3200);
-    };
-
-    const onTouchStart = () => {
-      activeTouchCount += 1;
-      autoScrollEnabled = false;
-      clearResumeTimer();
-    };
-
-    const onTouchEnd = () => {
-      activeTouchCount = Math.max(0, activeTouchCount - 1);
-      if (activeTouchCount === 0) {
-        disableAutoTemporarily();
-      }
-    };
-
-    const onScroll = () => {
-      if (programmaticScrollDepth > 0) return;
-      if (activeTouchCount > 0) return;
-      disableAutoTemporarily();
-    };
 
     const speedPxPerFrame = 0.48;
 
     const tick = () => {
       const half = wrapper.scrollWidth / 2;
-      if (autoScrollEnabled && activeTouchCount === 0 && half > 1) {
+      if (half > 1) {
         let next = root.scrollLeft + speedPxPerFrame;
         if (next >= half) next -= half;
-        programmaticScrollDepth += 1;
         root.scrollLeft = next;
-        programmaticScrollDepth -= 1;
       }
       rafId = window.requestAnimationFrame(tick);
     };
-
-    root.addEventListener('touchstart', onTouchStart, { passive: true });
-    root.addEventListener('touchend', onTouchEnd, { passive: true });
-    root.addEventListener('touchcancel', onTouchEnd, { passive: true });
-    root.addEventListener('scroll', onScroll, { passive: true });
 
     rafId = window.requestAnimationFrame(tick);
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      clearResumeTimer();
-      root.removeEventListener('touchstart', onTouchStart);
-      root.removeEventListener('touchend', onTouchEnd);
-      root.removeEventListener('touchcancel', onTouchEnd);
-      root.removeEventListener('scroll', onScroll);
     };
   }, [isMobile, selectedPartner]);
 
