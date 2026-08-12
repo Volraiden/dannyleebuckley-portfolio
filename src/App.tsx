@@ -147,6 +147,8 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading,      setIsLoading]      = useState(true);
   const [isMobile,       setIsMobile]       = useState(false);
+  const [reduceMotion,   setReduceMotion]   = useState(false);
+  const [canHover,       setCanHover]       = useState(false);
   const [theme,          setTheme]          = useState<'dark' | 'light'>('dark');
   const [headerScrolled, setHeaderScrolled] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<{ name: string; logo: string } | null>(null);
@@ -176,12 +178,6 @@ function App() {
   const titleParallaxX = useTransform(smoothX, [0, 1], ['-1.5%', '1.5%']);
   const titleParallaxY = useTransform(smoothY, [0, 1], ['-1%', '1%']);
 
-  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    heroMouseX.set((e.clientX - rect.left) / rect.width);
-    heroMouseY.set((e.clientY - rect.top)  / rect.height);
-  };
-
   /* ── Chat demo sequence ────────────────────────────────── */
   const chatDemoSequence = [
     { type: 'user' as const, text: t('chatDemo1') },
@@ -199,8 +195,12 @@ function App() {
   }, [locale]);
 
   useEffect(() => {
+    if (reduceMotion || document.hidden) return;
     let timeout: number;
+    let cancelled = false;
+
     const runSequence = () => {
+      if (cancelled || document.hidden) return;
       if (chatStep < chatDemoSequence.length) {
         setIsTyping(true);
         timeout = window.setTimeout(() => {
@@ -210,7 +210,7 @@ function App() {
           });
           setIsTyping(false);
           setChatStep((s) => s + 1);
-        }, 1500);
+        }, isMobile ? 1900 : 1500);
       } else {
         timeout = window.setTimeout(() => {
           setChatMessages([]);
@@ -218,15 +218,32 @@ function App() {
         }, 4000);
       }
     };
+
+    const onVis = () => {
+      if (document.hidden) {
+        window.clearTimeout(timeout);
+      } else {
+        runSequence();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVis);
     runSequence();
-    return () => window.clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      document.removeEventListener('visibilitychange', onVis);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatStep, locale]);
+  }, [chatStep, locale, reduceMotion, isMobile]);
 
   useEffect(() => {
-    const interval = window.setInterval(() => setShowInputCursor((p) => !p), 530);
+    if (reduceMotion) return;
+    const interval = window.setInterval(() => {
+      if (!document.hidden) setShowInputCursor((p) => !p);
+    }, 530);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [reduceMotion]);
 
   useEffect(() => {
     const el = aiPreviewMessagesRef.current;
@@ -254,114 +271,219 @@ function App() {
     window.localStorage.setItem('site-theme', theme);
   }, [theme]);
 
-  /* ── Mobile detection ──────────────────────────────────── */
+  /* ── Device / motion capability ────────────────────────── */
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)');
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
+    const mobileMq = window.matchMedia('(max-width: 768px)');
+    const reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const hoverMq = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    const sync = () => {
+      setIsMobile(mobileMq.matches);
+      setReduceMotion(reduceMq.matches);
+      setCanHover(hoverMq.matches);
+      document.documentElement.classList.toggle('is-mobile', mobileMq.matches);
+      document.documentElement.classList.toggle('reduce-motion', reduceMq.matches);
+      document.documentElement.classList.toggle('can-hover', hoverMq.matches);
+    };
+
+    sync();
+    mobileMq.addEventListener('change', sync);
+    reduceMq.addEventListener('change', sync);
+    hoverMq.addEventListener('change', sync);
+    return () => {
+      mobileMq.removeEventListener('change', sync);
+      reduceMq.removeEventListener('change', sync);
+      hoverMq.removeEventListener('change', sync);
+    };
   }, []);
 
-  /* ── Header scroll behaviour ───────────────────────────── */
+  /* ── Header scroll behaviour (rAF-throttled) ───────────── */
   useEffect(() => {
-    const onScroll = () => setHeaderScrolled(window.scrollY > 80);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setHeaderScrolled(window.scrollY > 80);
+        ticking = false;
+      });
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  /* ── Mobile logos auto-scroll ──────────────────────────── */
+  /* ── Mobile logos auto-scroll (pause on touch / hidden) ── */
   useEffect(() => {
-    if (!isMobile || selectedPartner) return;
+    if (!isMobile || selectedPartner || reduceMotion) return;
     const root = trustedLogosDisplayRef.current;
     if (!root) return;
     const wrapper = root.querySelector<HTMLElement>('.trusted-logos-wrapper');
     if (!wrapper) return;
+
     let rafId = 0;
-    const speed = 0.48;
+    let paused = false;
+    let resumeTimer = 0;
+    const speed = 0.42;
+
     const tick = () => {
-      const half = wrapper.scrollWidth / 2;
-      if (half > 1) {
-        let next = root.scrollLeft + speed;
-        if (next >= half) next -= half;
-        root.scrollLeft = next;
+      if (!paused && !document.hidden) {
+        const half = wrapper.scrollWidth / 2;
+        if (half > 1) {
+          let next = root.scrollLeft + speed;
+          if (next >= half) next -= half;
+          root.scrollLeft = next;
+        }
       }
       rafId = window.requestAnimationFrame(tick);
     };
+
+    const pause = () => {
+      paused = true;
+      window.clearTimeout(resumeTimer);
+    };
+    const scheduleResume = () => {
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        paused = false;
+      }, 1800);
+    };
+
+    root.addEventListener('touchstart', pause, { passive: true });
+    root.addEventListener('touchend', scheduleResume, { passive: true });
+    root.addEventListener('wheel', pause, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pause();
+      else scheduleResume();
+    });
+
     rafId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(rafId);
-  }, [isMobile, selectedPartner]);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(resumeTimer);
+      root.removeEventListener('touchstart', pause);
+      root.removeEventListener('touchend', scheduleResume);
+      root.removeEventListener('wheel', pause);
+    };
+  }, [isMobile, selectedPartner, reduceMotion]);
 
   /* ── Loader timer ──────────────────────────────────────── */
   useEffect(() => {
-    const delay = isMobile ? 300 : 1400;
+    const delay = reduceMotion ? 200 : isMobile ? 450 : 1200;
     const timer = window.setTimeout(() => setIsLoading(false), delay);
     return () => window.clearTimeout(timer);
-  }, [isMobile]);
+  }, [isMobile, reduceMotion]);
 
-  /* ── Video playback ────────────────────────────────────── */
+  /* ── Video playback (lazy + pause offscreen) ───────────── */
   useEffect(() => {
     const video = heroVideoRef.current;
     if (!video) return;
-    video.load();
 
     const play = async () => {
       try {
         if (video.paused) await video.play();
       } catch {
-        setVideoError(true);
+        /* autoplay may be blocked until interaction */
       }
     };
 
-    play();
-    video.addEventListener('loadeddata', () => { setVideoLoaded(true); play(); });
-    video.addEventListener('canplay',    () => { setVideoLoaded(true); play(); });
-    video.addEventListener('error',      () => setVideoError(true));
+    const onLoaded = () => setVideoLoaded(true);
+    const onError = () => setVideoError(true);
+
+    video.addEventListener('loadeddata', onLoaded);
+    video.addEventListener('canplay', onLoaded);
+    video.addEventListener('error', onError);
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        if (entry.isIntersecting && !document.hidden) {
+          play();
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(video);
+
+    const onVisibility = () => {
+      if (document.hidden) video.pause();
+      else if (video.getBoundingClientRect().top < window.innerHeight) play();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     const handleInteraction = () => {
       play();
-      document.removeEventListener('click',      handleInteraction);
+      document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
     };
-    document.addEventListener('click',      handleInteraction);
-    document.addEventListener('touchstart', handleInteraction);
+    document.addEventListener('click', handleInteraction, { once: true });
+    document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
+
+    // Kick off load without blocking first paint on mobile
+    if (video.readyState >= 2) setVideoLoaded(true);
+    else play();
 
     return () => {
-      document.removeEventListener('click',      handleInteraction);
+      io.disconnect();
+      video.removeEventListener('loadeddata', onLoaded);
+      video.removeEventListener('canplay', onLoaded);
+      video.removeEventListener('error', onError);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('click', handleInteraction);
       document.removeEventListener('touchstart', handleInteraction);
     };
   }, []);
 
-  /* ── Mobile logo preload ───────────────────────────────── */
-  useEffect(() => {
-    if (!isMobile) return;
-    clientLogos.forEach((c) => {
-      const img = new Image();
-      img.src = c.logo;
-      img.decoding = 'async';
-    });
-  }, [isMobile]);
-
   /* ── GSAP scroll reveals ───────────────────────────────── */
   useEffect(() => {
+    if (reduceMotion) {
+      document.querySelectorAll<HTMLElement>('.js-reveal, .stagger-item').forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+      return;
+    }
+
+    const yOffset = isMobile ? 28 : 48;
+    const duration = isMobile ? 0.55 : 0.9;
+
     const ctx = gsap.context(() => {
       gsap.utils.toArray<HTMLElement>('.js-reveal').forEach((el) => {
-        gsap.fromTo(el,
-          { y: 48, opacity: 0 },
+        gsap.fromTo(
+          el,
+          { y: yOffset, opacity: 0 },
           {
-            y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
-            scrollTrigger: { trigger: el, start: 'top 88%' },
+            y: 0,
+            opacity: 1,
+            duration,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 90%',
+              once: true,
+              toggleActions: 'play none none none',
+            },
           }
         );
       });
 
       gsap.utils.toArray<HTMLElement>('.stagger-grid').forEach((grid) => {
         const items = grid.querySelectorAll('.stagger-item');
-        gsap.fromTo(items,
-          { y: 28, opacity: 0 },
+        gsap.fromTo(
+          items,
+          { y: isMobile ? 18 : 28, opacity: 0 },
           {
-            y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: 'power3.out',
-            scrollTrigger: { trigger: grid, start: 'top 88%' },
+            y: 0,
+            opacity: 1,
+            duration: isMobile ? 0.45 : 0.7,
+            stagger: isMobile ? 0.06 : 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: grid,
+              start: 'top 90%',
+              once: true,
+            },
           }
         );
       });
@@ -371,17 +493,16 @@ function App() {
       ctx.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, []);
+  }, [isMobile, reduceMotion]);
 
   const toggleTheme = () => setTheme((p) => (p === 'dark' ? 'light' : 'dark'));
 
-  /* ── Camera scroll (about section) ────────────────────── */
-  useEffect(() => {
-    const container = cameraScrollContainerRef.current;
-    if (!container) return;
-    // CSS animation handles this — no JS needed
-    void container;
-  }, []);
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!canHover || reduceMotion || isMobile) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    heroMouseX.set((e.clientX - rect.left) / rect.width);
+    heroMouseY.set((e.clientY - rect.top) / rect.height);
+  };
 
   /* ══════════════════════════════════════════════════════
      RENDER
@@ -630,16 +751,24 @@ function App() {
           id="hero"
           className="hero-section"
           ref={heroRef}
-          onMouseMove={handleHeroMouseMove}
-          onMouseLeave={() => {
-            heroMouseX.set(0.5);
-            heroMouseY.set(0.5);
-          }}
+          onMouseMove={canHover && !reduceMotion ? handleHeroMouseMove : undefined}
+          onMouseLeave={
+            canHover && !reduceMotion
+              ? () => {
+                  heroMouseX.set(0.5);
+                  heroMouseY.set(0.5);
+                }
+              : undefined
+          }
         >
           {/* Parallax video layer */}
           <motion.div
             className="hero-video-layer"
-            style={{ x: videoParallaxX, y: videoParallaxY }}
+            style={
+              canHover && !reduceMotion && !isMobile
+                ? { x: videoParallaxX, y: videoParallaxY }
+                : undefined
+            }
           >
             <div className="hero-video-container">
               {!videoLoaded && !videoError && (
@@ -652,7 +781,7 @@ function App() {
                 loop
                 playsInline
                 className={`hero-video ${videoLoaded ? 'loaded' : ''}`}
-                preload="auto"
+                preload={isMobile ? 'metadata' : 'auto'}
                 poster="/images/profile-top-left.webp"
                 disablePictureInPicture
                 disableRemotePlayback
@@ -679,7 +808,11 @@ function App() {
           {/* Main content */}
           <motion.div
             className="hero-content"
-            style={{ x: titleParallaxX, y: titleParallaxY }}
+            style={
+              canHover && !reduceMotion && !isMobile
+                ? { x: titleParallaxX, y: titleParallaxY }
+                : undefined
+            }
           >
             <motion.span
               className="hero-eyebrow"
@@ -757,8 +890,12 @@ function App() {
               <span>{t('scrollExplore')}</span>
               <motion.div
                 className="scroll-line"
-                animate={{ scaleY: [0, 1, 0] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                animate={reduceMotion ? { scaleY: 1 } : { scaleY: [0, 1, 0] }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 2.2, repeat: Infinity, ease: 'easeInOut' }
+                }
               />
             </div>
 
@@ -915,8 +1052,12 @@ function App() {
               <div className="work-ui-strip">
                 <motion.span
                   className="work-rec-dot"
-                  animate={{ opacity: [1, 0.3, 1] }}
-                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={reduceMotion || isMobile ? { opacity: 1 } : { opacity: [1, 0.3, 1] }}
+                  transition={
+                    reduceMotion || isMobile
+                      ? { duration: 0 }
+                      : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }
+                  }
                 />
                 <span className="work-rec-label">REC</span>
                 <div className="work-strip-icons">
@@ -960,12 +1101,20 @@ function App() {
 
                 <motion.div
                   className="cinema-room-glow"
-                  animate={{ opacity: [0.3, 0.55, 0.3], scale: [1, 1.04, 1] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={
+                    reduceMotion || isMobile
+                      ? { opacity: 0.4 }
+                      : { opacity: [0.3, 0.55, 0.3], scale: [1, 1.04, 1] }
+                  }
+                  transition={
+                    reduceMotion || isMobile
+                      ? { duration: 0 }
+                      : { duration: 5, repeat: Infinity, ease: 'easeInOut' }
+                  }
                 />
 
                 <div className="cinema-light-beams" aria-hidden="true">
-                  {[...Array(3)].map((_, i) => (
+                  {[...Array(isMobile || reduceMotion ? 0 : 3)].map((_, i) => (
                     <motion.span
                       key={i}
                       className="light-beam"
@@ -1016,8 +1165,12 @@ function App() {
                       >
                         <motion.span
                           className="cinema-card-kicker"
-                          animate={{ opacity: [0.6, 1, 0.6] }}
-                          transition={{ duration: 2.2, repeat: Infinity }}
+                          animate={reduceMotion || isMobile ? { opacity: 1 } : { opacity: [0.6, 1, 0.6] }}
+                          transition={
+                            reduceMotion || isMobile
+                              ? { duration: 0 }
+                              : { duration: 2.2, repeat: Infinity }
+                          }
                         >
                           {t(item.categoryKey)}
                         </motion.span>
@@ -1042,7 +1195,7 @@ function App() {
 
                 {/* Ambient seat lights */}
                 <div className="cinema-ambient-lights" aria-hidden="true">
-                  {[...Array(8)].map((_, i) => (
+                  {[...Array(isMobile || reduceMotion ? 0 : 8)].map((_, i) => (
                     <motion.span
                       key={i}
                       className="cinema-light"
@@ -1185,8 +1338,10 @@ function App() {
                               src={client.logo}
                               alt={client.name}
                               className="trusted-logo-display-img"
-                              loading={isMobile ? 'eager' : 'lazy'}
+                              loading="lazy"
                               decoding="async"
+                              width={80}
+                              height={50}
                               onError={() =>
                                 setBrokenLogos((prev) => ({ ...prev, [client.name]: true }))
                               }
