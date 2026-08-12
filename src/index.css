@@ -120,9 +120,10 @@ body {
   overflow-x: hidden;
 }
 
-/* Hide default cursor when custom cursor is active */
-@media (hover: hover) and (pointer: fine) {
-  * { cursor: none !important; }
+/* Hide default cursor only when custom cursor is mounted */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
 }
 
 a {
@@ -194,40 +195,70 @@ button { cursor: pointer; }
   position: fixed;
   top: 0;
   left: 0;
-  width: 7px;
-  height: 7px;
-  background: var(--text);
+  width: 8px;
+  height: 8px;
+  background: var(--accent, #c4a882);
   border-radius: 50%;
   pointer-events: none;
   z-index: 10000;
-  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
   will-change: transform;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
 .cur-ring {
   position: fixed;
   top: 0;
   left: 0;
-  width: 34px;
-  height: 34px;
-  border: 1.5px solid rgba(237, 234, 228, 0.45);
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(196, 168, 130, 0.55);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
   will-change: transform;
+  background: rgba(8, 8, 9, 0.08);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cur-ring.is-hover {
+  border-color: rgba(196, 168, 130, 0.9);
+  background: rgba(196, 168, 130, 0.12);
+}
+
+.cur-ring.has-label {
+  background: rgba(8, 8, 9, 0.78);
+  border-color: rgba(196, 168, 130, 0.85);
+}
+
+:root[data-theme='light'] .cur-dot {
+  mix-blend-mode: normal;
+  background: #1a1714;
+}
+
+:root[data-theme='light'] .cur-ring {
+  border-color: rgba(26, 23, 20, 0.35);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+:root[data-theme='light'] .cur-ring.has-label {
+  background: rgba(26, 23, 20, 0.88);
+  border-color: rgba(196, 168, 130, 0.9);
 }
 
 .cur-label {
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text);
+  color: #edeae4;
   white-space: nowrap;
+  pointer-events: none;
   text-align: center;
   line-height: 1;
 }
@@ -440,6 +471,97 @@ button { cursor: pointer; }
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+}
+
+/* Language switcher */
+.language-switcher {
+  position: relative;
+  z-index: 40;
+}
+
+.language-switcher-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--panel);
+  color: var(--text-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: all 0.25s;
+}
+
+.language-switcher-trigger:hover,
+.language-switcher.open .language-switcher-trigger {
+  background: var(--panel-hover);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.language-switcher-flag {
+  width: 18px;
+  height: 12px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.language-switcher-name {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.language-switcher-chevron {
+  opacity: 0.65;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.language-switcher.open .language-switcher-chevron {
+  transform: rotate(180deg);
+}
+
+.language-switcher-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 168px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-elevated, var(--bg-card, #121214));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.language-switcher-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text-2);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background 0.2s, color 0.2s;
+}
+
+.language-switcher-option:hover,
+.language-switcher-option.active {
+  background: var(--panel-hover, rgba(255, 255, 255, 0.06));
+  color: var(--text);
 }
 
 .site-theme-toggle {

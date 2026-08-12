@@ -140,7 +140,7 @@ function App() {
   const cameraScrollContainerRef = useRef<HTMLDivElement>(null);
   const trustedLogosDisplayRef   = useRef<HTMLDivElement>(null);
 
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
 
   /* ── State ─────────────────────────────────────────────── */
   const [chatOpen,       setChatOpen]       = useState(false);
@@ -184,14 +184,19 @@ function App() {
 
   /* ── Chat demo sequence ────────────────────────────────── */
   const chatDemoSequence = [
-    { type: 'user' as const, text: 'Can I book you for an event shoot next week?' },
-    { type: 'bot'  as const, text: 'Absolutely! I specialise in motorsport and brand events. What location?' },
-    { type: 'user' as const, text: 'Dubai, Formula racing content.' },
-    { type: 'bot'  as const, text: 'Perfect fit! 🏎️ Opening the full AI chat so we can discuss dates and pricing.' },
-    { type: 'user' as const, text: 'What packages do you offer?' },
-    { type: 'bot'  as const, text: 'Half-day (4h) and full-day (8h) packages — both include editing and fast turnaround.' },
-    { type: 'bot'  as const, text: 'Click "Open Chat" above to see detailed pricing and availability!' },
+    { type: 'user' as const, text: t('chatDemo1') },
+    { type: 'bot'  as const, text: t('chatDemo2') },
+    { type: 'user' as const, text: t('chatDemo3') },
+    { type: 'bot'  as const, text: t('chatDemo4') },
+    { type: 'user' as const, text: t('chatDemo5') },
+    { type: 'bot'  as const, text: t('chatDemo6') },
+    { type: 'bot'  as const, text: t('chatDemo7') },
   ];
+
+  useEffect(() => {
+    setChatMessages([]);
+    setChatStep(0);
+  }, [locale]);
 
   useEffect(() => {
     let timeout: number;
@@ -216,7 +221,7 @@ function App() {
     runSequence();
     return () => window.clearTimeout(timeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatStep]);
+  }, [chatStep, locale]);
 
   useEffect(() => {
     const interval = window.setInterval(() => setShowInputCursor((p) => !p), 530);
@@ -233,6 +238,11 @@ function App() {
   }, [chatMessages]);
 
   /* ── Theme init ────────────────────────────────────────── */
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+  }, [locale]);
+
   useEffect(() => {
     const saved = window.localStorage.getItem('site-theme');
     if (saved === 'light' || saved === 'dark') { setTheme(saved); return; }
@@ -421,7 +431,7 @@ function App() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.85, duration: 0.6 }}
           >
-            CREATIVE STUDIO
+            {t('creativeStudio').toUpperCase()}
           </motion.p>
           <motion.div
             className="loader-progress-track"
@@ -484,7 +494,7 @@ function App() {
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           >
             {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-            <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+            <span>{theme === 'dark' ? t('themeLight') : t('themeDark')}</span>
           </button>
 
           <motion.a
@@ -510,7 +520,7 @@ function App() {
             whileHover={{ y: -2, opacity: 0.88 }}
             whileTap={{ scale: 0.97 }}
           >
-            Book a Call
+            {t('bookACall')}
           </motion.a>
 
           <button
@@ -586,7 +596,7 @@ function App() {
                 onClick={toggleTheme}
               >
                 {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-                <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+                <span>{theme === 'dark' ? t('themeLight') : t('themeDark')}</span>
               </button>
               <div style={{ display: 'flex', marginLeft: 'auto' }}>
                 <LanguageSwitcher />
@@ -598,7 +608,7 @@ function App() {
                 className="mobile-nav-cta-link"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Book a Call
+                {t('bookACall')}
               </a>
             </motion.div>
           </motion.div>
@@ -663,7 +673,7 @@ function App() {
 
           {/* Side text — vertical */}
           <div className="hero-side-tag" aria-hidden="true">
-            <span>CINEMATOGRAPHER · PHOTOGRAPHER · DEVELOPER</span>
+            <span>{t('heroSideTag').toUpperCase()}</span>
           </div>
 
           {/* Main content */}
@@ -677,7 +687,7 @@ function App() {
               animate={!isLoading ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              — DUNEWORKS CREATIVE STUDIO —
+              {t('heroEyebrow')}
             </motion.span>
 
             <h1 className="hero-title">
@@ -741,7 +751,7 @@ function App() {
             animate={!isLoading ? { opacity: 1 } : {}}
             transition={{ delay: 1.5, duration: 1 }}
           >
-            <span className="hero-location">Dubai, UAE</span>
+            <span className="hero-location">{t('locationLabel')}</span>
 
             <div className="hero-scroll-indicator">
               <span>{t('scrollExplore')}</span>
@@ -838,8 +848,8 @@ function App() {
           <div className="container">
 
             <div className="services-header js-reveal">
-              <span className="section-tag">Services</span>
-              <h2 className="section-headline">What We Do</h2>
+              <span className="section-tag">{t('sectionServices')}</span>
+              <h2 className="section-headline">{t('servicesHeading')}</h2>
             </div>
 
             <ul className="services-list" role="list">
@@ -928,9 +938,9 @@ function App() {
             >
               <div className="cinema-room-topbar">
                 {[
-                  { delay: 0.2, label: 'Cinema Room' },
-                  { delay: 0.3, label: 'IMAX',       className: 'imax' },
-                  { delay: 0.4, label: 'Dolby Atmos' },
+                  { delay: 0.2, label: t('cinemaRoom') },
+                  { delay: 0.3, label: t('imax'), className: 'imax' },
+                  { delay: 0.4, label: t('dolbyAtmos') },
                 ].map(({ delay, label, className }) => (
                   <motion.span
                     key={label}
@@ -1060,8 +1070,8 @@ function App() {
             {/* Mobile: services + featured showcase */}
             <div className="mobile-services-showcase">
               <div className="mobile-services-header">
-                <span className="mobile-services-label">What I Do</span>
-                <h3 className="mobile-services-title">Services</h3>
+                <span className="mobile-services-label">{t('whatIDo')}</span>
+                <h3 className="mobile-services-title">{t('sectionServices')}</h3>
               </div>
               <div className="mobile-services-grid">
                 {serviceKeys.map((service, i) => (
@@ -1086,8 +1096,8 @@ function App() {
               </div>
 
               <div className="mobile-featured-header">
-                <span className="mobile-services-label">Featured</span>
-                <h3 className="mobile-services-title">Work</h3>
+                <span className="mobile-services-label">{t('featuredLabel')}</span>
+                <h3 className="mobile-services-title">{t('sectionWork')}</h3>
               </div>
               <div className="mobile-featured-grid">
                 {featuredWorkKeys.map((item, i) => (
@@ -1109,7 +1119,7 @@ function App() {
                       rel="noreferrer"
                       className="mobile-featured-link"
                     >
-                      <span>View on Instagram</span>
+                      <span>{t('viewOnInstagram')}</span>
                       <ExternalLink size={13} />
                     </a>
                   </motion.div>
@@ -1261,7 +1271,7 @@ function App() {
 
                       <div className="camera-info-panel">
                         <p className="camera-info-name">{selectedPartner.name}</p>
-                        <p className="camera-info-meta">Trusted Partner · 4K Resolution</p>
+                        <p className="camera-info-meta">{t('trustedPartner')}</p>
                       </div>
 
                       <button
@@ -1286,10 +1296,10 @@ function App() {
                       AI
                     </div>
                     <div>
-                      <p className="ai-preview-title">Daniel's AI Assistant</p>
+                      <p className="ai-preview-title">{t('aiAssistantTitle')}</p>
                       <p className="ai-preview-status">
                         <span className="ai-status-dot" />
-                        Online now
+                        {t('onlineNow')}
                       </p>
                     </div>
                   </div>
@@ -1298,7 +1308,7 @@ function App() {
                     className="mini-booking-btn"
                     onClick={() => setChatOpen(true)}
                   >
-                    Open Chat
+                    {t('openChat')}
                   </button>
                 </div>
 
@@ -1337,7 +1347,7 @@ function App() {
                     {userInput}
                     <span className={`input-cursor ${showInputCursor ? 'visible' : ''}`}>|</span>
                     {!userInput && (
-                      <span className="input-placeholder">Click to start chatting…</span>
+                      <span className="input-placeholder">{t('clickToChat')}</span>
                     )}
                   </button>
                 </div>
@@ -1345,10 +1355,10 @@ function App() {
 
               {/* ── Mini booking card ────────────────────── */}
               <div className="mini-booking-card js-reveal" style={{ marginTop: '20px' }}>
-                <p className="mini-booking-kicker">Available for bookings</p>
-                <h4>Book me for your next project or call</h4>
+                <p className="mini-booking-kicker">{t('availableBookings')}</p>
+                <h4>{t('bookMeHeading')}</h4>
                 <p className="mini-booking-copy">
-                  Fast response for events, brand shoots, and commercial collaborations.
+                  {t('bookMeCopy')}
                 </p>
                 <a
                   href="https://cal.com/danielleebuckley"
@@ -1357,7 +1367,7 @@ function App() {
                   className="mini-booking-btn"
                   data-cursor="BOOK"
                 >
-                  Book Me on Cal.com
+                  {t('bookMeOnCal')}
                 </a>
               </div>
             </div>
@@ -1423,7 +1433,7 @@ function App() {
                   href: 'https://cal.com/danielleebuckley',
                   cls: 'booking-btn',
                   icon: <CalendarDays size={26} />,
-                  label: 'Book a Call',
+                  label: t('bookACall'),
                   handle: 'cal.com/danielleebuckley',
                   external: true,
                 },
@@ -1496,7 +1506,7 @@ function App() {
                       type="text"
                       id="name"
                       name="name"
-                      placeholder="Your name"
+                      placeholder={t('namePlaceholder')}
                       required
                     />
                   </div>
@@ -1506,7 +1516,7 @@ function App() {
                       type="email"
                       id="email"
                       name="email"
-                      placeholder="your@email.com"
+                      placeholder={t('emailPlaceholder')}
                       required
                     />
                   </div>
@@ -1567,9 +1577,9 @@ function App() {
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true, margin: '-80px' }}
           >
-            <span className="footer-eyebrow">Available for worldwide projects</span>
+            <span className="footer-eyebrow">{t('footerEyebrow')}</span>
             <h2 className="footer-headline">
-              LET'S CREATE<br />SOMETHING.
+              {t('footerHeadline').toUpperCase()}
             </h2>
             <a
               href="mailto:Danielleebuckley@gmail.com"

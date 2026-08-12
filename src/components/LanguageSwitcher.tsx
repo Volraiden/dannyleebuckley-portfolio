@@ -27,7 +27,15 @@ export function LanguageSwitcher() {
         aria-haspopup="listbox"
         aria-label="Select language"
       >
-        <span className="language-switcher-flag">{current.flag}</span>
+        <img
+          className="language-switcher-flag"
+          src={current.flagSrc}
+          alt=""
+          width={18}
+          height={12}
+          loading="eager"
+          decoding="async"
+        />
         <span className="language-switcher-name">{current.name}</span>
         <svg className="language-switcher-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
           <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -45,7 +53,15 @@ export function LanguageSwitcher() {
                   setOpen(false);
                 }}
               >
-                <span className="language-switcher-flag">{opt.flag}</span>
+                <img
+                  className="language-switcher-flag"
+                  src={opt.flagSrc}
+                  alt=""
+                  width={18}
+                  height={12}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <span>{opt.name}</span>
               </button>
             </li>

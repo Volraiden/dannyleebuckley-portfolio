@@ -12,15 +12,25 @@ type LanguageContextType = {
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window === 'undefined') return 'en';
+    const saved = window.localStorage.getItem('site-locale');
+    if (saved === 'en' || saved === 'ru' || saved === 'uz' || saved === 'ar' || saved === 'tr') {
+      return saved;
+    }
+    return 'en';
+  });
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
+    window.localStorage.setItem('site-locale', newLocale);
   }, []);
 
   const t = useCallback(
     (key: string) => {
-      return translations[locale][key] ?? translations.en[key] ?? key;
+      const table = translations[locale] as Record<string, string>;
+      const fallback = translations.en as Record<string, string>;
+      return table[key] ?? fallback[key] ?? key;
     },
     [locale]
   );

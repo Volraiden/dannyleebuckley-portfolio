@@ -2,28 +2,31 @@ import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export function CustomCursor() {
+  const [enabled, setEnabled] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isHover, setIsHover] = useState(false);
   const [cursorLabel, setCursorLabel] = useState('');
-  const [isTouch] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  );
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Dot: instant
-  const dotX = useSpring(mouseX, { stiffness: 900, damping: 55, mass: 0.1 });
-  const dotY = useSpring(mouseY, { stiffness: 900, damping: 55, mass: 0.1 });
-
-  // Ring: slightly delayed
-  const ringX = useSpring(mouseX, { stiffness: 200, damping: 28, mass: 0.5 });
-  const ringY = useSpring(mouseY, { stiffness: 200, damping: 28, mass: 0.5 });
+  const dotX = useSpring(mouseX, { stiffness: 1000, damping: 50, mass: 0.08 });
+  const dotY = useSpring(mouseY, { stiffness: 1000, damping: 50, mass: 0.08 });
+  const ringX = useSpring(mouseX, { stiffness: 220, damping: 26, mass: 0.45 });
+  const ringY = useSpring(mouseY, { stiffness: 220, damping: 26, mass: 0.45 });
 
   useEffect(() => {
-    if (isTouch) return;
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const sync = () => setEnabled(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    document.documentElement.classList.add('has-custom-cursor');
 
     const onMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -33,71 +36,71 @@ export function CustomCursor() {
     const onLeave = () => setVisible(false);
     const onEnter = () => setVisible(true);
 
-    const attachInteractivity = () => {
-      document.querySelectorAll<HTMLElement>('a, button, [role="button"], [data-cursor]').forEach((el) => {
-        const label = el.dataset.cursor ?? '';
-        const onIn = () => {
-          setIsHover(true);
-          setCursorLabel(label);
-        };
-        const onOut = () => {
-          setIsHover(false);
-          setCursorLabel('');
-        };
-        el.addEventListener('mouseenter', onIn);
-        el.addEventListener('mouseleave', onOut);
-      });
+    const interactiveSelector =
+      'a, button, [role="button"], [data-cursor], input, textarea, select, .service-item, .featured-card';
+
+    const onOver = (e: Event) => {
+      const target = (e.target as HTMLElement | null)?.closest?.(interactiveSelector) as
+        | HTMLElement
+        | null;
+      if (!target) return;
+      setIsHover(true);
+      setCursorLabel(target.dataset.cursor ?? '');
     };
 
-    window.addEventListener('mousemove', onMove);
+    const onOut = (e: Event) => {
+      const related = (e as MouseEvent).relatedTarget as HTMLElement | null;
+      if (related?.closest?.(interactiveSelector)) return;
+      setIsHover(false);
+      setCursorLabel('');
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
     document.documentElement.addEventListener('mouseleave', onLeave);
     document.documentElement.addEventListener('mouseenter', onEnter);
-    attachInteractivity();
-
-    const observer = new MutationObserver(attachInteractivity);
-    observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener('mouseover', onOver);
+    document.addEventListener('mouseout', onOut);
 
     return () => {
+      document.documentElement.classList.remove('has-custom-cursor');
       window.removeEventListener('mousemove', onMove);
       document.documentElement.removeEventListener('mouseleave', onLeave);
       document.documentElement.removeEventListener('mouseenter', onEnter);
-      observer.disconnect();
+      document.removeEventListener('mouseover', onOver);
+      document.removeEventListener('mouseout', onOut);
     };
-  }, [isTouch, mouseX, mouseY]);
+  }, [enabled, mouseX, mouseY]);
 
-  if (isTouch) return null;
+  if (!enabled) return null;
 
   const hasLabel = !!cursorLabel && isHover;
 
   return (
     <>
-      {/* Inner dot */}
       <motion.div
         className="cur-dot"
-        style={{ x: dotX, y: dotY }}
+        style={{ x: dotX, y: dotY, translateX: '-50%', translateY: '-50%' }}
         animate={{
           scale: isHover ? 0 : 1,
           opacity: visible ? 1 : 0,
         }}
         transition={{ duration: 0.15 }}
       />
-
-      {/* Outer ring */}
       <motion.div
-        className="cur-ring"
-        style={{ x: ringX, y: ringY }}
+        className={`cur-ring ${isHover ? 'is-hover' : ''} ${hasLabel ? 'has-label' : ''}`}
+        style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
         animate={{
-          scale: hasLabel ? 3.2 : isHover ? 2 : 1,
+          scale: hasLabel ? 2.8 : isHover ? 1.65 : 1,
           opacity: visible ? 1 : 0,
         }}
-        transition={{ duration: 0.28, ease: 'easeOut' }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
       >
         {hasLabel && (
           <motion.span
             className="cur-label"
-            initial={{ opacity: 0, scale: 0.7 }}
+            initial={{ opacity: 0, scale: 0.75 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: 0.16 }}
           >
             {cursorLabel}
           </motion.span>
