@@ -24,6 +24,7 @@ import { useLanguage } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { AIChat } from './components/AIChat';
 import { CustomCursor } from './components/CustomCursor';
+import { PhotoGallery } from './components/PhotoGallery';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -595,6 +596,7 @@ function App() {
         <nav className="site-nav-desk" aria-label="Primary">
           <a href="#about">{t('navAbout')}</a>
           <a href="#work">{t('navWork')}</a>
+          <a href="#gallery">{t('navGallery')}</a>
           <a href="#contact">{t('navContact')}</a>
           <button
             type="button"
@@ -681,7 +683,8 @@ function App() {
               {[
                 { href: '#about',   label: t('navAbout'),   num: '01' },
                 { href: '#work',    label: t('navWork'),    num: '02' },
-                { href: '#contact', label: t('navContact'), num: '03' },
+                { href: '#gallery', label: t('navGallery'), num: '03' },
+                { href: '#contact', label: t('navContact'), num: '04' },
               ].map((link, i) => (
                 <motion.a
                   key={link.href}
@@ -1563,11 +1566,13 @@ function App() {
           </div>
         </section>
 
+        <PhotoGallery />
+
         {/* ────────────────────────────────────────────
             CONTACT
             ──────────────────────────────────────────── */}
         <section id="contact" className="contact-section">
-          <div className="section-number-bg" aria-hidden="true">04</div>
+          <div className="section-number-bg" aria-hidden="true">05</div>
           <div className="container">
 
             <div className="contact-header js-reveal">
@@ -1758,6 +1763,7 @@ function App() {
             <nav className="footer-nav" aria-label="Footer">
               <a href="#about">{t('navAbout')}</a>
               <a href="#work">{t('navWork')}</a>
+              <a href="#gallery">{t('navGallery')}</a>
               <a href="#contact">{t('navContact')}</a>
             </nav>
 
