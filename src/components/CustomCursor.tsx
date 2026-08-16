@@ -45,7 +45,8 @@ export function CustomCursor() {
         | null;
       if (!target) return;
       setIsHover(true);
-      setCursorLabel(target.dataset.cursor ?? '');
+      const raw = target.dataset.cursor ?? '';
+      setCursorLabel(raw === 'hover' ? '' : raw);
     };
 
     const onOut = (e: Event) => {
@@ -90,17 +91,17 @@ export function CustomCursor() {
         className={`cur-ring ${isHover ? 'is-hover' : ''} ${hasLabel ? 'has-label' : ''}`}
         style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
         animate={{
-          scale: hasLabel ? 2.8 : isHover ? 1.65 : 1,
+          scale: hasLabel ? 1.12 : isHover ? 1.38 : 1,
           opacity: visible ? 1 : 0,
         }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         {hasLabel && (
           <motion.span
             className="cur-label"
-            initial={{ opacity: 0, scale: 0.75 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.16 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.14 }}
           >
             {cursorLabel}
           </motion.span>

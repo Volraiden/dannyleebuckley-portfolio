@@ -1,32 +1,48 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 const GALLERY_COUNT = 134;
-const BATCH = 24;
+const ROW_COUNT = 3;
 
 const GALLERY = Array.from({ length: GALLERY_COUNT }, (_, i) => ({
   src: `/images/gallery/${String(i + 1).padStart(2, '0')}.png`,
   alt: `Still ${String(i + 1).padStart(2, '0')}`,
+  index: i,
 }));
+
+const ROWS = Array.from({ length: ROW_COUNT }, (_, row) =>
+  GALLERY.filter((_, i) => i % ROW_COUNT === row)
+);
 
 function pad(n: number) {
   return String(n).padStart(2, '0');
 }
 
+function markLoaded(img: HTMLImageElement | null) {
+  if (!img) return;
+  const reveal = () => img.classList.add('is-loaded');
+  if (img.complete && img.naturalWidth > 0) {
+    reveal();
+    return;
+  }
+  img.addEventListener('load', reveal, { once: true });
+}
+
 export function PhotoGallery() {
   const { t } = useLanguage();
-  const [visibleCount, setVisibleCount] = useState(BATCH);
   const [active, setActive] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const lightboxRef = useRef<HTMLDivElement>(null);
+  const riversRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<number | null>(null);
 
-  const visible = useMemo(() => GALLERY.slice(0, visibleCount), [visibleCount]);
-  const remaining = GALLERY_COUNT - visibleCount;
+  const copies = useMemo(() => (reduceMotion ? [0] : [0, 1]), [reduceMotion]);
 
   const goTo = useCallback((next: number, dir: number) => {
     setDirection(dir);
@@ -48,6 +64,25 @@ export function PhotoGallery() {
       return;
     }
     void node.requestFullscreen().catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    const el = riversRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '120px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -97,6 +132,13 @@ export function PhotoGallery() {
     if (delta < 0) goTo(active + 1, 1);
     else goTo(active - 1, -1);
   };
+
+  const openStill = (index: number) => {
+    setDirection(0);
+    setActive(index);
+  };
+
+  const playing = inView && active === null && !reduceMotion;
 
   const lightbox =
     typeof document !== 'undefined'
@@ -189,7 +231,9 @@ export function PhotoGallery() {
 
   return (
     <section id="gallery" className="gallery-section">
-      <div className="section-number-bg" aria-hidden="true">04</div>
+      <div className="section-number-bg" aria-hidden="true">
+        04
+      </div>
       <div className="container">
         <div className="gallery-header js-reveal">
           <span className="section-tag">{t('sectionGallery')}</span>
@@ -199,58 +243,47 @@ export function PhotoGallery() {
             <span>{GALLERY_COUNT} FRAMES</span>
           </div>
         </div>
+      </div>
 
-        <div className="gallery-masonry">
-          {visible.map((item, i) => (
-            <motion.button
-              key={item.src}
-              type="button"
-              className="gallery-tile"
-              data-cursor="VIEW"
-              onClick={() => {
-                setDirection(0);
-                setActive(i);
-              }}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '80px' }}
-              transition={{ duration: 0.45, delay: Math.min(i % BATCH, 8) * 0.04 }}
-              aria-label={`${t('galleryView')} ${pad(i + 1)}`}
-            >
-              <img
-                src={item.src}
-                alt={item.alt}
-                loading={i < 6 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
-              <span className="gallery-tile-veil">
-                <span className="gallery-tile-index">{pad(i + 1)}</span>
-              </span>
-            </motion.button>
-          ))}
-        </div>
-
-        {remaining > 0 && (
-          <div className="gallery-more">
-            <button
-              type="button"
-              className="btn-ghost gallery-more-btn"
-              onClick={() => setVisibleCount((n) => Math.min(n + BATCH, GALLERY_COUNT))}
-            >
-              {t('galleryShowMore')}
-              <span className="gallery-more-count">+{Math.min(BATCH, remaining)}</span>
-            </button>
-            {visibleCount < GALLERY_COUNT && (
-              <button
-                type="button"
-                className="gallery-show-all"
-                onClick={() => setVisibleCount(GALLERY_COUNT)}
-              >
-                {t('galleryShowAll')}
-              </button>
-            )}
+      <div
+        ref={riversRef}
+        className={`gallery-rivers${playing ? ' is-playing' : ''}${reduceMotion ? ' is-static' : ''}`}
+      >
+        {ROWS.map((rowItems, row) => (
+          <div
+            key={row}
+            className="gallery-river"
+            data-dir={row % 2 === 0 ? 'ltr' : 'rtl'}
+            style={{ '--gallery-dur': `${52 + row * 14}s` } as CSSProperties}
+          >
+            <div className="gallery-river-track">
+              {copies.map((copy) =>
+                rowItems.map((item, i) => (
+                  <button
+                    key={`${copy}-${item.index}`}
+                    type="button"
+                    className="gallery-river-tile"
+                    data-cursor="VIEW"
+                    onClick={() => openStill(item.index)}
+                    aria-label={`${t('galleryView')} ${pad(item.index + 1)}`}
+                  >
+                    <img
+                      ref={markLoaded}
+                      src={item.src}
+                      alt={item.alt}
+                      loading={copy === 0 && i < 5 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      draggable={false}
+                    />
+                    <span className="gallery-tile-veil">
+                      <span className="gallery-tile-index">{pad(item.index + 1)}</span>
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
           </div>
-        )}
+        ))}
       </div>
       {lightbox}
     </section>
