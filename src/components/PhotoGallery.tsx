@@ -1,25 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import {
+  GALLERY,
+  GALLERY_COUNT,
+  GALLERY_FILTERS,
+  padFrame,
+  type GalleryCategory,
+} from '../data/gallery';
 
-const GALLERY_COUNT = 134;
 const ROW_COUNT = 3;
-
-const GALLERY = Array.from({ length: GALLERY_COUNT }, (_, i) => ({
-  src: `/images/gallery/${String(i + 1).padStart(2, '0')}.png`,
-  alt: `Still ${String(i + 1).padStart(2, '0')}`,
-  index: i,
-}));
-
-const ROWS = Array.from({ length: ROW_COUNT }, (_, row) =>
-  GALLERY.filter((_, i) => i % ROW_COUNT === row)
-);
-
-function pad(n: number) {
-  return String(n).padStart(2, '0');
-}
+const MOBILE_BATCH = 18;
 
 function markLoaded(img: HTMLImageElement | null) {
   if (!img) return;
@@ -33,21 +26,61 @@ function markLoaded(img: HTMLImageElement | null) {
 
 export function PhotoGallery() {
   const { t } = useLanguage();
+  const [filter, setFilter] = useState<GalleryCategory | 'all'>('all');
   const [active, setActive] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [inView, setInView] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches
+  );
+  const [visibleCount, setVisibleCount] = useState(MOBILE_BATCH);
   const lightboxRef = useRef<HTMLDivElement>(null);
   const riversRef = useRef<HTMLDivElement>(null);
   const swipeStart = useRef<number | null>(null);
 
-  const copies = useMemo(() => (reduceMotion ? [0] : [0, 1]), [reduceMotion]);
+  const filtered = useMemo(
+    () =>
+      filter === 'all'
+        ? GALLERY
+        : GALLERY.filter((item) => item.categories.includes(filter)),
+    [filter]
+  );
 
-  const goTo = useCallback((next: number, dir: number) => {
-    setDirection(dir);
-    setActive((next + GALLERY_COUNT) % GALLERY_COUNT);
-  }, []);
+  const rows = useMemo(() => {
+    const pool = filtered.length ? filtered : GALLERY;
+    return Array.from({ length: ROW_COUNT }, (_, row) =>
+      pool.filter((_, i) => i % ROW_COUNT === row)
+    );
+  }, [filtered]);
+
+  const copies = useMemo(
+    () => (reduceMotion || isMobile ? [0] : [0, 1]),
+    [reduceMotion, isMobile]
+  );
+
+  const mobileTiles = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount]
+  );
+
+  const goToIndex = useCallback(
+    (nextIndex: number, dir: number) => {
+      const list = filtered.length ? filtered : GALLERY;
+      const pos = list.findIndex((item) => item.index === nextIndex);
+      const fallback = list[0]?.index ?? 0;
+      if (pos === -1) {
+        setDirection(dir);
+        setActive(fallback);
+        return;
+      }
+      const wrapped = list[(pos + dir + list.length) % list.length];
+      setDirection(dir);
+      setActive(wrapped.index);
+    },
+    [filtered]
+  );
 
   const close = useCallback(() => {
     if (document.fullscreenElement) {
@@ -67,11 +100,19 @@ export function PhotoGallery() {
   }, []);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setReduceMotion(mq.matches);
+    const reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mobileMq = window.matchMedia('(max-width: 768px)');
+    const sync = () => {
+      setReduceMotion(reduceMq.matches);
+      setIsMobile(mobileMq.matches);
+    };
     sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
+    reduceMq.addEventListener('change', sync);
+    mobileMq.addEventListener('change', sync);
+    return () => {
+      reduceMq.removeEventListener('change', sync);
+      mobileMq.removeEventListener('change', sync);
+    };
   }, []);
 
   useEffect(() => {
@@ -93,8 +134,8 @@ export function PhotoGallery() {
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();
-      if (e.key === 'ArrowRight') goTo(active + 1, 1);
-      if (e.key === 'ArrowLeft') goTo(active - 1, -1);
+      if (e.key === 'ArrowRight') goToIndex(active, 1);
+      if (e.key === 'ArrowLeft') goToIndex(active, -1);
       if (e.key === 'f' || e.key === 'F') toggleFullscreen();
     };
 
@@ -109,16 +150,22 @@ export function PhotoGallery() {
       window.removeEventListener('keydown', onKey);
       document.removeEventListener('fullscreenchange', onFs);
     };
-  }, [active, close, goTo, toggleFullscreen]);
+  }, [active, close, goToIndex, toggleFullscreen]);
 
   useEffect(() => {
     if (active === null) return;
-    [active - 1, active + 1].forEach((i) => {
-      const idx = (i + GALLERY_COUNT) % GALLERY_COUNT;
+    if (!filtered.some((item) => item.index === active)) {
+      setActive(filtered[0]?.index ?? null);
+      return;
+    }
+    const pos = filtered.findIndex((item) => item.index === active);
+    [-1, 1].forEach((offset) => {
+      const neighbor = filtered[(pos + offset + filtered.length) % filtered.length];
+      if (!neighbor) return;
       const img = new Image();
-      img.src = GALLERY[idx].src;
+      img.src = neighbor.src;
     });
-  }, [active]);
+  }, [active, filtered]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     swipeStart.current = e.clientX;
@@ -129,8 +176,8 @@ export function PhotoGallery() {
     const delta = e.clientX - swipeStart.current;
     swipeStart.current = null;
     if (Math.abs(delta) < 56) return;
-    if (delta < 0) goTo(active + 1, 1);
-    else goTo(active - 1, -1);
+    if (delta < 0) goToIndex(active, 1);
+    else goToIndex(active, -1);
   };
 
   const openStill = (index: number) => {
@@ -138,7 +185,8 @@ export function PhotoGallery() {
     setActive(index);
   };
 
-  const playing = inView && active === null && !reduceMotion;
+  const playing = inView && active === null && !reduceMotion && !isMobile;
+  const staticTracks = reduceMotion || isMobile;
 
   const lightbox =
     typeof document !== 'undefined'
@@ -161,7 +209,7 @@ export function PhotoGallery() {
               >
                 <div className="gallery-lightbox-bar">
                   <span className="gallery-lightbox-count">
-                    {pad(active + 1)}
+                    {padFrame(active + 1)}
                     <span> / {GALLERY_COUNT}</span>
                   </span>
                   <div className="gallery-lightbox-actions">
@@ -187,7 +235,7 @@ export function PhotoGallery() {
                 <button
                   type="button"
                   className="gallery-lb-nav gallery-lb-prev"
-                  onClick={() => goTo(active - 1, -1)}
+                  onClick={() => goToIndex(active, -1)}
                   aria-label={t('galleryPrev')}
                 >
                   <ChevronLeft size={28} />
@@ -217,7 +265,7 @@ export function PhotoGallery() {
                 <button
                   type="button"
                   className="gallery-lb-nav gallery-lb-next"
-                  onClick={() => goTo(active + 1, 1)}
+                  onClick={() => goToIndex(active, 1)}
                   aria-label={t('galleryNext')}
                 >
                   <ChevronRight size={28} />
@@ -240,51 +288,114 @@ export function PhotoGallery() {
           <h2 className="section-headline">{t('galleryHeading')}</h2>
           <div className="gallery-meta">
             <span className="gallery-meta-dot" />
-            <span>{GALLERY_COUNT} FRAMES</span>
+            <span>
+              {filtered.length} / {GALLERY_COUNT} FRAMES
+            </span>
           </div>
+        </div>
+
+        <div className="gallery-filters" role="tablist" aria-label={t('sectionGallery')}>
+          {GALLERY_FILTERS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={filter === item.id}
+              className={`gallery-filter${filter === item.id ? ' is-active' : ''}`}
+              onClick={() => {
+                startTransition(() => {
+                  setFilter(item.id);
+                  setVisibleCount(MOBILE_BATCH);
+                });
+              }}
+            >
+              {t(item.labelKey)}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div
-        ref={riversRef}
-        className={`gallery-rivers${playing ? ' is-playing' : ''}${reduceMotion ? ' is-static' : ''}`}
-      >
-        {ROWS.map((rowItems, row) => (
-          <div
-            key={row}
-            className="gallery-river"
-            data-dir={row % 2 === 0 ? 'ltr' : 'rtl'}
-            style={{ '--gallery-dur': `${52 + row * 14}s` } as CSSProperties}
-          >
-            <div className="gallery-river-track">
-              {copies.map((copy) =>
-                rowItems.map((item, i) => (
-                  <button
-                    key={`${copy}-${item.index}`}
-                    type="button"
-                    className="gallery-river-tile"
-                    data-cursor="VIEW"
-                    onClick={() => openStill(item.index)}
-                    aria-label={`${t('galleryView')} ${pad(item.index + 1)}`}
-                  >
-                    <img
-                      ref={markLoaded}
-                      src={item.src}
-                      alt={item.alt}
-                      loading={copy === 0 && i < 5 ? 'eager' : 'lazy'}
-                      decoding="async"
-                      draggable={false}
-                    />
-                    <span className="gallery-tile-veil">
-                      <span className="gallery-tile-index">{pad(item.index + 1)}</span>
-                    </span>
-                  </button>
-                ))
-              )}
+      {isMobile ? (
+        <div className="gallery-masonry">
+          {mobileTiles.map((item, i) => (
+            <button
+              key={item.src}
+              type="button"
+              className="gallery-masonry-tile"
+              onClick={() => openStill(item.index)}
+              aria-label={`${t('galleryView')} ${padFrame(item.index + 1)}`}
+            >
+              <img
+                ref={markLoaded}
+                src={item.src}
+                alt={item.alt}
+                loading={i < 4 ? 'eager' : 'lazy'}
+                decoding="async"
+                draggable={false}
+              />
+              <span className="gallery-tile-veil">
+                <span className="gallery-tile-index">{padFrame(item.index + 1)}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div
+          ref={riversRef}
+          className={`gallery-rivers${playing ? ' is-playing' : ''}${staticTracks ? ' is-static' : ''}`}
+        >
+          {rows.map((rowItems, row) => (
+            <div
+              key={`${filter}-${row}`}
+              className="gallery-river"
+              data-dir={row % 2 === 0 ? 'ltr' : 'rtl'}
+              style={{ '--gallery-dur': `${52 + row * 14}s` } as CSSProperties}
+            >
+              <div className="gallery-river-track">
+                {copies.map((copy) =>
+                  rowItems.map((item, i) => (
+                    <button
+                      key={`${copy}-${item.index}`}
+                      type="button"
+                      className="gallery-river-tile"
+                      data-cursor="VIEW"
+                      onClick={() => openStill(item.index)}
+                      aria-label={`${t('galleryView')} ${padFrame(item.index + 1)}`}
+                    >
+                      <img
+                        ref={markLoaded}
+                        src={item.src}
+                        alt={item.alt}
+                        loading={copy === 0 && i < 5 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        draggable={false}
+                      />
+                      <span className="gallery-tile-veil">
+                        <span className="gallery-tile-index">{padFrame(item.index + 1)}</span>
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {isMobile && visibleCount < filtered.length && (
+        <div className="gallery-more">
+          <button
+            type="button"
+            className="btn-ghost gallery-more-btn"
+            onClick={() => setVisibleCount((n) => Math.min(n + MOBILE_BATCH, filtered.length))}
+          >
+            {t('galleryShowMore')}
+            <span className="gallery-more-count">
+              +{Math.min(MOBILE_BATCH, filtered.length - visibleCount)}
+            </span>
+          </button>
+        </div>
+      )}
       {lightbox}
     </section>
   );

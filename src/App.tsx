@@ -25,6 +25,7 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { AIChat } from './components/AIChat';
 import { CustomCursor } from './components/CustomCursor';
 import { PhotoGallery } from './components/PhotoGallery';
+import { Motorsport } from './components/Motorsport';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -157,6 +158,7 @@ function App() {
   const [brokenLogos,    setBrokenLogos]    = useState<Record<string, boolean>>({});
   const [videoLoaded,    setVideoLoaded]    = useState(false);
   const [videoError,     setVideoError]     = useState(false);
+  const [formStatus,     setFormStatus]     = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   /* AI demo chat */
   const [chatMessages, setChatMessages] = useState<{ type: 'user' | 'bot'; text: string }[]>([]);
@@ -313,6 +315,20 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [mobileMenuOpen]);
+
   /* ── Mobile logos auto-scroll (pause on touch / hidden) ── */
   useEffect(() => {
     if (!isMobile || selectedPartner || reduceMotion) return;
@@ -350,6 +366,7 @@ function App() {
     };
 
     root.addEventListener('touchstart', pause, { passive: true });
+    root.addEventListener('touchmove', pause, { passive: true });
     root.addEventListener('touchend', scheduleResume, { passive: true });
     root.addEventListener('wheel', pause, { passive: true });
     document.addEventListener('visibilitychange', () => {
@@ -362,6 +379,7 @@ function App() {
       window.cancelAnimationFrame(rafId);
       window.clearTimeout(resumeTimer);
       root.removeEventListener('touchstart', pause);
+      root.removeEventListener('touchmove', pause);
       root.removeEventListener('touchend', scheduleResume);
       root.removeEventListener('wheel', pause);
     };
@@ -594,9 +612,10 @@ function App() {
         </motion.a>
 
         <nav className="site-nav-desk" aria-label="Primary">
-          <a href="#about">{t('navAbout')}</a>
-          <a href="#work">{t('navWork')}</a>
+          <a href="#hero">{t('navHome')}</a>
           <a href="#gallery">{t('navGallery')}</a>
+          <a href="#motorsport">{t('navMotorsport')}</a>
+          <a href="#about">{t('navAbout')}</a>
           <a href="#contact">{t('navContact')}</a>
           <button
             type="button"
@@ -652,6 +671,7 @@ function App() {
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation"
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav"
           >
             <Menu size={20} />
           </button>
@@ -664,11 +684,15 @@ function App() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
+            id="mobile-nav"
             className="mobile-nav-fullscreen"
-            initial={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 38px) 38px)' }}
-            animate={{ opacity: 1, clipPath: 'circle(170% at calc(100% - 38px) 38px)' }}
-            exit={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 38px) 38px)' }}
-            transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0.12 : 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <button
               type="button"
@@ -681,10 +705,11 @@ function App() {
 
             <nav className="mobile-nav-links-wrap" aria-label="Mobile">
               {[
-                { href: '#about',   label: t('navAbout'),   num: '01' },
-                { href: '#work',    label: t('navWork'),    num: '02' },
-                { href: '#gallery', label: t('navGallery'), num: '03' },
-                { href: '#contact', label: t('navContact'), num: '04' },
+                { href: '#hero',        label: t('navHome'),        num: '01' },
+                { href: '#gallery',     label: t('navGallery'),     num: '02' },
+                { href: '#motorsport',  label: t('navMotorsport'),  num: '03' },
+                { href: '#about',       label: t('navAbout'),       num: '04' },
+                { href: '#contact',     label: t('navContact'),     num: '05' },
               ].map((link, i) => (
                 <motion.a
                   key={link.href}
@@ -865,7 +890,7 @@ function App() {
               transition={{ delay: 1.25, duration: 0.8 }}
             >
               <a
-                href="#work"
+                href="#gallery"
                 className="btn-primary"
                 data-cursor="EXPLORE"
               >
@@ -938,8 +963,17 @@ function App() {
                 </div>
               </div>
 
-              {/* Camera gadget */}
               <div className="about-visual-col js-reveal">
+                <figure className="about-portrait">
+                  <img
+                    src="/images/about-portrait.jpg?v=2"
+                    alt="Daniel Lee Buckley"
+                    width={682}
+                    height={1024}
+                    decoding="async"
+                  />
+                  <figcaption>Daniel Lee Buckley</figcaption>
+                </figure>
                 <div className="camera-card" aria-hidden="true">
                   <div className="camera-viewfinder-eyepiece">
                     <div className="eyepiece-tube">
@@ -980,10 +1014,12 @@ function App() {
           </div>
         </section>
 
+        <Motorsport />
+
         {/* ────────────────────────────────────────────
             SERVICES (numbered list)
             ──────────────────────────────────────────── */}
-        <section id="services" className="services-section">
+        <section id="services" className="services-section desktop-only">
           <div className="section-number-bg" aria-hidden="true">02</div>
           <div className="container">
 
@@ -1011,7 +1047,7 @@ function App() {
                     <div className="service-main">
                       <h3 className="service-name">{t(service.titleKey)}</h3>
                       <AnimatePresence>
-                        {hoveredService === index && (
+                        {(hoveredService === index || !canHover) && (
                           <motion.div
                             className="service-desc-wrap"
                             initial={{ height: 0, opacity: 0 }}
@@ -1578,6 +1614,7 @@ function App() {
             <div className="contact-header js-reveal">
               <span className="section-tag">{t('sectionContact')}</span>
               <h2 className="section-headline">{t('getInTouchHeading')}</h2>
+              <p className="contact-lead">{t('contactLead')}</p>
             </div>
 
             {/* Social links */}
@@ -1658,6 +1695,27 @@ function App() {
                 className="contact-form"
                 action="https://formspree.io/f/xqeypano"
                 method="POST"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                  }
+                  setFormStatus('sending');
+                  try {
+                    const res = await fetch('https://formspree.io/f/xqeypano', {
+                      method: 'POST',
+                      body: new FormData(form),
+                      headers: { Accept: 'application/json' },
+                    });
+                    if (!res.ok) throw new Error('send-failed');
+                    setFormStatus('success');
+                    form.reset();
+                  } catch {
+                    setFormStatus('error');
+                  }
+                }}
               >
                 <div className="form-row">
                   <div className="form-group">
@@ -1708,13 +1766,20 @@ function App() {
                 <motion.button
                   type="submit"
                   className="submit-btn"
+                  disabled={formStatus === 'sending'}
                   whileHover={{ y: -3, scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                 >
                   <Send size={16} />
-                  <span>{t('sendMessage')}</span>
+                  <span>{formStatus === 'sending' ? t('formSending') : t('sendMessage')}</span>
                 </motion.button>
 
+                {formStatus === 'success' && (
+                  <p className="form-status is-success" role="status">{t('formSuccess')}</p>
+                )}
+                {formStatus === 'error' && (
+                  <p className="form-status is-error" role="alert">{t('formError')}</p>
+                )}
                 <p className="form-note">{t('formNote')}</p>
               </form>
             </motion.div>
@@ -1761,9 +1826,10 @@ function App() {
             </div>
 
             <nav className="footer-nav" aria-label="Footer">
-              <a href="#about">{t('navAbout')}</a>
-              <a href="#work">{t('navWork')}</a>
+              <a href="#hero">{t('navHome')}</a>
               <a href="#gallery">{t('navGallery')}</a>
+              <a href="#motorsport">{t('navMotorsport')}</a>
+              <a href="#about">{t('navAbout')}</a>
               <a href="#contact">{t('navContact')}</a>
             </nav>
 
