@@ -37,7 +37,7 @@ const en = {
   heroSideTag: 'Photographer · Filmmaker · Visual Storyteller',
   trustedBy: 'Trusted By',
   trustedByBadge: 'TRUSTED BY',
-  brandsCount: '14+ BRANDS',
+  brandsCount: '20+ BRANDS',
   viewfinderLabel: 'Viewfinder',
   getInTouchHeading: "Let's create something extraordinary.",
   contactLead:
@@ -196,7 +196,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     heroSideTag: 'Фотограф · Режиссёр · Сторителлер',
     trustedBy: 'Мне доверяют',
     trustedByBadge: 'МНЕ ДОВЕРЯЮТ',
-    brandsCount: '14+ БРЕНДОВ',
+    brandsCount: '20+ БРЕНДОВ',
     viewfinderLabel: 'Видоискатель',
     getInTouchHeading: 'Давайте создадим что-то исключительное.',
     contactLead:
@@ -340,7 +340,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     heroSideTag: 'Kinematograf · Fotograf · Dasturchi',
     trustedBy: 'Ishonch',
     trustedByBadge: 'ISHONCHLI',
-    brandsCount: '14+ BREND',
+    brandsCount: '20+ BREND',
     viewfinderLabel: "Ko'rish maydoni",
     getInTouchHeading: 'Keling, g‘ayrioddiy narsa yarataylik.',
     contactLead:
@@ -484,7 +484,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     heroSideTag: 'مخرج سينمائي · مصور · مطور',
     trustedBy: 'يثقون بي',
     trustedByBadge: 'يثقون بي',
-    brandsCount: '14+ علامة',
+    brandsCount: '20+ علامة',
     viewfinderLabel: 'المنظار',
     getInTouchHeading: 'لنصنع شيئاً استثنائياً.',
     contactLead:
@@ -626,7 +626,7 @@ export const translations: Record<Locale, Record<TranslationKey, string>> = {
     heroSideTag: 'Sinematograf · Fotoğrafçı · Geliştirici',
     trustedBy: 'Güvenenler',
     trustedByBadge: 'GÜVENENLER',
-    brandsCount: '14+ MARKA',
+    brandsCount: '20+ MARKA',
     viewfinderLabel: 'Vizör',
     getInTouchHeading: 'Olağanüstü bir şey yaratalım.',
     contactLead:

@@ -98,6 +98,12 @@ const featuredWorkKeys = [
 ];
 
 const clientLogos = [
+  { name: 'Kosp',                logo: '/images/logos/kosp.png' },
+  { name: 'N',                   logo: '/images/logos/n-logo.png' },
+  { name: 'Kapital Bank',        logo: '/images/logos/kapitalbank.png' },
+  { name: 'Visa',                logo: '/images/logos/visa.png' },
+  { name: 'FIFA',                logo: '/images/logos/fifa.png' },
+  { name: '24h Le Mans',         logo: '/images/logos/le-mans.png' },
   { name: 'Client 2',            logo: 'https://danielbuckley.pics/images/logos/client2.png' },
   { name: 'Client 3',            logo: 'https://danielbuckley.pics/images/logos/client3.png' },
   { name: 'Client 4',            logo: 'https://danielbuckley.pics/images/logos/client4.png' },
@@ -329,9 +335,9 @@ function App() {
     };
   }, [mobileMenuOpen]);
 
-  /* ── Mobile logos auto-scroll (pause on touch / hidden) ── */
+  /* ── Mobile logos: slow auto-scroll + finger drag ── */
   useEffect(() => {
-    if (!isMobile || selectedPartner || reduceMotion) return;
+    if (reduceMotion || selectedPartner) return;
     const root = trustedLogosDisplayRef.current;
     if (!root) return;
     const wrapper = root.querySelector<HTMLElement>('.trusted-logos-wrapper');
@@ -340,50 +346,86 @@ function App() {
     let rafId = 0;
     let paused = false;
     let resumeTimer = 0;
-    const speed = 0.42;
+    let offset = 0;
+    let lastX = 0;
+    let dragging = false;
+    const speed = 0.28;
+
+    const isPhone = () => window.matchMedia('(max-width: 768px)').matches;
+
+    const apply = () => {
+      const half = wrapper.scrollWidth / 2;
+      if (half > 1) {
+        while (offset < 0) offset += half;
+        while (offset >= half) offset -= half;
+      }
+      wrapper.style.transform = `translate3d(${-offset}px,0,0)`;
+    };
 
     const tick = () => {
-      if (!paused && !document.hidden) {
-        const half = wrapper.scrollWidth / 2;
-        if (half > 1) {
-          let next = root.scrollLeft + speed;
-          if (next >= half) next -= half;
-          root.scrollLeft = next;
+      if (isPhone()) {
+        if (!paused && !document.hidden) {
+          offset += speed;
+          apply();
         }
+      } else if (wrapper.style.transform) {
+        wrapper.style.transform = '';
+        offset = 0;
       }
       rafId = window.requestAnimationFrame(tick);
     };
 
     const pause = () => {
       paused = true;
+      root.classList.add('is-paused');
       window.clearTimeout(resumeTimer);
     };
     const scheduleResume = () => {
+      dragging = false;
       window.clearTimeout(resumeTimer);
       resumeTimer = window.setTimeout(() => {
         paused = false;
-      }, 1800);
+        root.classList.remove('is-paused');
+      }, 1400);
     };
 
-    root.addEventListener('touchstart', pause, { passive: true });
-    root.addEventListener('touchmove', pause, { passive: true });
+    const onTouchStart = (e: TouchEvent) => {
+      if (!isPhone()) return;
+      pause();
+      dragging = true;
+      lastX = e.touches[0]?.clientX ?? 0;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isPhone() || !dragging) return;
+      const x = e.touches[0]?.clientX ?? lastX;
+      offset -= x - lastX;
+      lastX = x;
+      apply();
+    };
+
+    root.addEventListener('touchstart', onTouchStart, { passive: true });
+    root.addEventListener('touchmove', onTouchMove, { passive: true });
     root.addEventListener('touchend', scheduleResume, { passive: true });
-    root.addEventListener('wheel', pause, { passive: true });
-    document.addEventListener('visibilitychange', () => {
+    root.addEventListener('touchcancel', scheduleResume, { passive: true });
+    const onVis = () => {
       if (document.hidden) pause();
       else scheduleResume();
-    });
+    };
+    document.addEventListener('visibilitychange', onVis);
 
     rafId = window.requestAnimationFrame(tick);
     return () => {
       window.cancelAnimationFrame(rafId);
       window.clearTimeout(resumeTimer);
-      root.removeEventListener('touchstart', pause);
-      root.removeEventListener('touchmove', pause);
+      wrapper.style.transform = '';
+      root.classList.remove('is-paused');
+      root.removeEventListener('touchstart', onTouchStart);
+      root.removeEventListener('touchmove', onTouchMove);
       root.removeEventListener('touchend', scheduleResume);
-      root.removeEventListener('wheel', pause);
+      root.removeEventListener('touchcancel', scheduleResume);
+      document.removeEventListener('visibilitychange', onVis);
     };
-  }, [isMobile, selectedPartner, reduceMotion]);
+  }, [selectedPartner, reduceMotion]);
 
   /* ── Loader timer ──────────────────────────────────────── */
   useEffect(() => {

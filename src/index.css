@@ -2121,8 +2121,12 @@ html.is-mobile[data-theme='light'] .site-header {
   align-items: center;
   gap: 0;
   white-space: nowrap;
-  animation: logoScroll 35s linear infinite;
+  animation: logoScroll 45s linear infinite;
   will-change: transform;
+}
+
+.trusted-logos-display.is-paused .trusted-logos-wrapper {
+  animation-play-state: paused;
 }
 
 @keyframes logoScroll {
@@ -2148,10 +2152,10 @@ html.is-mobile[data-theme='light'] .site-header {
 .trusted-logo-btn:hover { background: var(--panel); }
 
 .trusted-logo-display-img {
-  max-width: 80px;
-  max-height: 50px;
+  max-width: 92px;
+  max-height: 54px;
   object-fit: contain;
-  filter: grayscale(1) brightness(0.7);
+  filter: grayscale(1) brightness(0.85);
   transition: filter 0.4s;
 }
 
@@ -4551,7 +4555,10 @@ html.is-mobile[data-theme='light'] .site-header {
   .site-shell::after { display: none; }
   .trusted-logos-wrapper {
     animation: none !important;
-    will-change: auto;
+    will-change: transform;
+  }
+  .trusted-logos-display {
+    touch-action: pan-x;
   }
   .camera-scroll-track {
     animation-duration: 28s;
